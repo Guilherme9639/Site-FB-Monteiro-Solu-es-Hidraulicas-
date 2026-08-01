@@ -4,132 +4,128 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content="Soluções hidráulicas da FB Monteiro." />
-
     <title>FB Monteiro | Soluções Hidráulicas</title>
-
     <link rel="stylesheet" href="/src/styles.css" />
   </head>
 
   <body>
     <header class="site-header">
-  <div class="header-content">
-    <a href="#inicio" class="logo">
-      <img
-        src="/images/logo-fb-monteiro-horizontal.png"
-        alt="FB Monteiro Soluções Hidráulicas"
-      />
-    </a>
+      <div class="header-content">
+        <a href="#inicio" class="logo">
+          <img
+            src="/images/logo-fb-monteiro-horizontal.png"
+            alt="FB Monteiro Soluções Hidráulicas"
+          />
+        </a>
 
-    <nav aria-label="Navegação principal">
-      <a href="#inicio">Início</a>
-      <a href="#sobre">Sobre</a>
-      <a href="#contato">Contato</a>
-    </nav>
+        <nav aria-label="Navegação principal">
+          <a href="#inicio">Início</a>
+          <a href="#sobre">Sobre</a>
+          <a href="#contato">Contato</a>
+        </nav>
 
-    <a
-      class="whatsapp-button"
-      href="https://wa.me/5531984879622"
-      target="_blank"
-      rel="noopener noreferrer"
-    >
-      Solicitar orçamento
-    </a>
-  </div>
-</header>
-
-    <main id="inicio">
-  <section class="hero">
-    <section id="contato" class="contact-section">
-  <div class="contact-content">
-    <div class="contact-intro">
-      <span class="section-label">Entre em contato</span>
-
-      <h2>Solicite seu orçamento</h2>
-
-      <p>
-        Conte brevemente o serviço de que precisa. A FB Monteiro entrará em
-        contato para entender sua necessidade.
-      </p>
-    </div>
-
-    <form id="contact-form" class="contact-form">
-      <div class="form-field">
-        <label for="name">Nome</label>
-        <input
-          id="name"
-          name="name"
-          type="text"
-          autocomplete="name"
-          required
-        />
-      </div>
-
-      <div class="form-field">
-        <label for="phone">Telefone ou WhatsApp</label>
-        <input
-          id="phone"
-          name="phone"
-          type="tel"
-          autocomplete="tel"
-          required
-        />
-      </div>
-
-      <div class="form-field">
-        <label for="message">Como podemos ajudar?</label>
-        <textarea
-          id="message"
-          name="message"
-          rows="5"
-          required
-        ></textarea>
-      </div>
-
-      <button class="submit-button" type="submit">
-        Enviar solicitação
-      </button>
-
-      <p id="form-feedback" class="form-feedback" aria-live="polite"></p>
-    </form>
-  </div>
-</section>
-    <div class="hero-content">
-      <span class="hero-label">Soluções hidráulicas profissionais</span>
-
-      <h1>
-        Qualidade e compromisso em
-        <strong>soluções hidráulicas</strong>
-      </h1>
-
-      <p>
-        Atendimento responsável para encontrar a solução adequada às
-        necessidades do seu imóvel.
-      </p>
-
-      <div class="hero-actions">
         <a
-          class="primary-button"
+          class="whatsapp-button"
           href="https://wa.me/5531984879622"
           target="_blank"
           rel="noopener noreferrer"
         >
           Solicitar orçamento
         </a>
-
-        <a class="secondary-button" href="#sobre">
-          Conheça a empresa
-        </a>
       </div>
-    </div>
+    </header>
 
-    <div class="hero-visual" aria-hidden="true">
-      <img
-        src="/images/logo-fb-monteiro.png"
-        alt=""
-      />
-    </div>
-  </section>
-</main>
+    <main id="inicio">
+      <section class="hero">
+        <div class="hero-content">
+          <span class="hero-label">Soluções hidráulicas profissionais</span>
+
+          <h1>
+            Qualidade e compromisso em
+            <strong>soluções hidráulicas</strong>
+          </h1>
+
+          <p>
+            Atendimento responsável para encontrar a solução adequada às
+            necessidades do seu imóvel.
+          </p>
+
+          <div class="hero-actions">
+            <a
+              class="primary-button"
+              href="https://wa.me/5531984879622"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Solicitar orçamento
+            </a>
+
+            <a class="secondary-button" href="#sobre">Conheça a empresa</a>
+          </div>
+        </div>
+
+        <div class="hero-visual" aria-hidden="true">
+          <img src="/images/logo-fb-monteiro.png" alt="" />
+        </div>
+      </section>
+
+      <section id="contato" class="contact-section">
+        <div class="contact-content">
+          <div class="contact-intro">
+            <span class="section-label">Entre em contato</span>
+            <h2>Solicite seu orçamento</h2>
+            <p>
+              Conte brevemente o serviço de que precisa. A FB Monteiro entrará
+              em contato para entender sua necessidade.
+            </p>
+          </div>
+
+          <form id="contact-form" class="contact-form">
+            <div class="form-field">
+              <label for="name">Nome</label>
+              <input
+                id="name"
+                name="name"
+                type="text"
+                autocomplete="name"
+                required
+              />
+            </div>
+
+            <div class="form-field">
+              <label for="phone">Telefone ou WhatsApp</label>
+              <input
+                id="phone"
+                name="phone"
+                type="tel"
+                autocomplete="tel"
+                required
+              />
+            </div>
+
+            <div class="form-field">
+              <label for="message">Como podemos ajudar?</label>
+              <textarea
+                id="message"
+                name="message"
+                rows="5"
+                required
+              ></textarea>
+            </div>
+
+            <button class="submit-button" type="submit">
+              Enviar solicitação
+            </button>
+
+            <p
+              id="form-feedback"
+              class="form-feedback"
+              aria-live="polite"
+            ></p>
+          </form>
+        </div>
+      </section>
+    </main>
 
     <footer>
       <p>FB Monteiro Soluções Hidráulicas</p>
@@ -138,4 +134,3 @@
     <script type="module" src="/src/main.js"></script>
   </body>
 </html>
-
