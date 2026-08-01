@@ -1,5 +1,3 @@
-const statusElement = document.querySelector("#api-status");
-
 async function verificarApi() {
   try {
     const response = await fetch("http://localhost:3000/api/health");
@@ -9,10 +7,9 @@ async function verificarApi() {
     }
 
     const data = await response.json();
-    statusElement.textContent = data.message;
+    console.log(data.message);
   } catch (error) {
-    statusElement.textContent = "Não foi possível conectar ao servidor.";
-    console.error(error);
+    console.error("Não foi possível conectar ao servidor:", error);
   }
 }
 
