@@ -8,9 +8,14 @@
   background: #f4f8fb;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 body {
   min-height: 100vh;
   margin: 0;
+  background-color: #f4f8fb;
 }
 
 .site-header {
@@ -33,28 +38,47 @@ body {
   height: auto;
 }
 
-nav {
+.header-content nav {
   display: flex;
   gap: 2rem;
 }
 
-nav a {
+.header-content nav a {
   color: #ffffff;
   font-weight: 600;
   text-decoration: none;
 }
 
-nav a:hover {
+.header-content nav a:hover {
   color: #f26a2e;
 }
 
-.whatsapp-button{
-  display: none;
+.whatsapp-button {
+  display: inline-block;
+  padding: 0.8rem 1.2rem;
+  color: #ffffff;
+  font-weight: 700;
+  text-decoration: none;
+  background-color: #f26a2e;
+  border-radius: 0.5rem;
+  transition:
+    background-color 0.2s,
+    transform 0.2s;
 }
 
 .whatsapp-button:hover {
   background-color: #d95620;
+  transform: translateY(-2px);
 }
+
+.header-content nav a:focus-visible,
+.whatsapp-button:focus-visible,
+.primary-button:focus-visible,
+.secondary-button:focus-visible {
+  outline: 3px solid #f26a2e;
+  outline-offset: 4px;
+}
+
 main {
   width: 100%;
 }
@@ -117,8 +141,9 @@ main {
   text-decoration: none;
   border-radius: 0.5rem;
   transition:
-    transform 0.2s,
-    background-color 0.2s;
+    background-color 0.2s,
+    color 0.2s,
+    transform 0.2s;
 }
 
 .primary-button {
@@ -171,7 +196,7 @@ main {
     width: 120px;
   }
 
-  nav {
+  .header-content nav {
     order: 3;
     justify-content: center;
     width: 100%;
@@ -217,26 +242,25 @@ main {
     justify-content: center;
   }
 
+  .header-content > .whatsapp-button {
+    display: none;
+  }
+
   .logo img {
     width: 110px;
   }
 
-  .whatsapp-button {
-    width: 100%;
-    text-align: center;
-  }
-
-  nav {
+  .header-content nav {
     gap: 1rem;
   }
 
-  nav a {
+  .header-content nav a {
     font-size: 0.9rem;
   }
 
   .hero {
     width: min(88%, 1200px);
-    padding: 3rem 0;
+    padding: 2.5rem 0;
   }
 
   .hero h1 {
