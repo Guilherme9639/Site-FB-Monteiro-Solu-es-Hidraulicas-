@@ -1,0 +1,292 @@
+:root {
+  font-family: Arial, Helvetica, sans-serif;
+  color: #17324d;
+  background: #f4f8fb;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  min-width: 320px;
+  min-height: 100vh;
+  margin: 0;
+  background: #f4f8fb;
+}
+
+button,
+input,
+textarea {
+  font: inherit;
+}
+
+button {
+  padding: 0.75rem 1rem;
+  color: #ffffff;
+  font-weight: 700;
+  cursor: pointer;
+  background: #f26a2e;
+  border: 0;
+  border-radius: 0.5rem;
+}
+
+button:hover {
+  background: #d95620;
+}
+
+button:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+
+.secondary-button,
+.danger-button {
+  color: #17324d;
+  background: #e5edf4;
+}
+
+.secondary-button:hover {
+  background: #d2e0eb;
+}
+
+.danger-button {
+  color: #ffffff;
+  background: #c92a2a;
+}
+
+.danger-button:hover {
+  background: #a61e1e;
+}
+
+.admin-shell {
+  width: min(94%, 1180px);
+  margin: 0 auto;
+  padding: 3rem 0 5rem;
+}
+
+.panel-card,
+.project-card {
+  padding: 1.5rem;
+  background: #ffffff;
+  border: 1px solid #dce6ee;
+  border-radius: 1rem;
+  box-shadow: 0 0.75rem 2rem rgb(23 50 77 / 8%);
+}
+
+.login-card {
+  width: min(100%, 440px);
+  margin: 10vh auto 0;
+}
+
+h1,
+h2,
+p {
+  margin-top: 0;
+}
+
+h1 {
+  margin-bottom: 0.5rem;
+}
+
+h2 {
+  margin-bottom: 1rem;
+}
+
+.eyebrow {
+  margin-bottom: 0.5rem;
+  color: #f26a2e;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.08rem;
+  text-transform: uppercase;
+}
+
+.stack-form {
+  display: grid;
+  gap: 1rem;
+}
+
+label {
+  display: grid;
+  gap: 0.4rem;
+  font-weight: 700;
+}
+
+input,
+textarea {
+  width: 100%;
+  padding: 0.75rem 0.85rem;
+  color: #17324d;
+  background: #fbfdff;
+  border: 1px solid #bdccd8;
+  border-radius: 0.5rem;
+}
+
+textarea {
+  resize: vertical;
+}
+
+.dashboard-header,
+.section-heading,
+.project-header,
+.project-actions,
+.image-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.dashboard-header {
+  margin-bottom: 2rem;
+}
+
+.dashboard-header p:last-child {
+  margin-bottom: 0;
+  color: #60748a;
+}
+
+.section-heading {
+  margin: 2rem 0 1rem;
+}
+
+.projects-list {
+  display: grid;
+  gap: 1.25rem;
+}
+
+.project-card {
+  display: grid;
+  gap: 1.25rem;
+}
+
+.project-header {
+  align-items: flex-start;
+}
+
+.project-header h3 {
+  margin: 0 0 0.35rem;
+}
+
+.project-meta {
+  margin: 0;
+  color: #60748a;
+  font-size: 0.9rem;
+}
+
+.project-description {
+  margin: 0;
+  white-space: pre-wrap;
+}
+
+.visibility-badge {
+  padding: 0.35rem 0.6rem;
+  color: #ffffff;
+  font-size: 0.8rem;
+  font-weight: 700;
+  background: #087f5b;
+  border-radius: 999px;
+}
+
+.visibility-badge.hidden-badge {
+  color: #17324d;
+  background: #e5edf4;
+}
+
+.project-actions {
+  justify-content: flex-start;
+  flex-wrap: wrap;
+}
+
+.image-upload {
+  display: grid;
+  gap: 0.75rem;
+  padding: 1rem;
+  background: #f4f8fb;
+  border-radius: 0.75rem;
+}
+
+.image-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  gap: 1rem;
+}
+
+.image-card {
+  display: grid;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  border: 1px solid #dce6ee;
+  border-radius: 0.75rem;
+}
+
+.site-images-section {
+  margin-top: 2rem;
+}
+
+.site-images-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1rem;
+}
+
+.site-image-card {
+  display: grid;
+  gap: 0.75rem;
+  padding: 1rem;
+  border: 1px solid #dce6ee;
+  border-radius: 0.75rem;
+}
+
+.site-image-card img {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  background: #e5edf4;
+  border-radius: 0.5rem;
+}
+
+.image-card img {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  background: #e5edf4;
+  border-radius: 0.5rem;
+}
+
+.image-card small {
+  color: #60748a;
+}
+
+.image-actions {
+  justify-content: flex-start;
+  flex-wrap: wrap;
+}
+
+.feedback {
+  min-height: 1.25rem;
+  margin-bottom: 0;
+  font-weight: 700;
+}
+
+.feedback.error {
+  color: #c92a2a;
+}
+
+.feedback.success {
+  color: #087f5b;
+}
+
+@media (max-width: 620px) {
+  .admin-shell {
+    padding-top: 1.5rem;
+  }
+
+  .dashboard-header,
+  .section-heading,
+  .project-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}

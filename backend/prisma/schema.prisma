@@ -7,6 +7,83 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model AdminUser {
+  id           String    @id @default(uuid())
+  name         String
+  email        String    @unique
+  passwordHash String
+  role         String    @default("ADMIN")
+  isActive     Boolean   @default(true)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  sessions     Session[]
+}
+
+model Session {
+  id           String    @id @default(uuid())
+  tokenHash    String    @unique
+  adminUserId  String
+  expiresAt    DateTime
+  lastUsedAt   DateTime?
+  createdAt    DateTime  @default(now())
+  adminUser    AdminUser @relation(fields: [adminUserId], references: [id], onDelete: Cascade)
+
+  @@index([adminUserId])
+  @@index([expiresAt])
+}
+
+model Project {
+  id          String         @id @default(uuid())
+  title       String
+  slug        String         @unique
+  description String?
+  isVisible   Boolean        @default(false)
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+  images      ProjectImage[]
+
+  @@index([isVisible])
+  @@index([createdAt])
+}
+
+model ProjectImage {
+  id           String   @id @default(uuid())
+  projectId    String
+  url          String
+  storageKey   String   @unique
+  originalName String
+  mimeType     String
+  size         Int
+  description  String?
+  displayOrder Int      @default(0)
+  isVisible    Boolean  @default(true)
+  isCover      Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  project      Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId, displayOrder])
+  @@index([projectId, isVisible])
+}
+
+model SiteImage {
+  id           String   @id @default(uuid())
+  key          String   @unique
+  section      String
+  url          String
+  storageKey   String   @unique
+  originalName String
+  mimeType     String
+  size         Int
+  description  String?
+  isVisible    Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([section])
+  @@index([isVisible])
+}
+
 model Contact {
   id        String   @id @default(uuid())
   name      String

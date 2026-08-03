@@ -156,6 +156,76 @@ Nunca inserir senhas, tokens ou URLs privadas neste arquivo de contexto ou no `.
 - Não registrar senhas, tokens ou dados completos de contato nos logs.
 - Nunca executar `db push` em produção; usar migrations versionadas e `db:deploy`.
 
+## Atualização — painel administrativo local
+
+Data: 03/08/2026
+
+O plano local foi implementado. PostgreSQL, deploy, HTTPS, backups e armazenamento externo permanecem fora do escopo atual.
+
+### Autenticação
+
+Foram adicionados os modelos `AdminUser` e `Session`, seed idempotente e os endpoints:
+
+```text
+POST /api/admin/auth/login
+POST /api/admin/auth/logout
+GET  /api/admin/auth/me
+```
+
+O primeiro administrador é criado com `ADMIN_EMAIL`, `ADMIN_PASSWORD` e `ADMIN_NAME` no `.env`. A senha usa Argon2id; a sessão usa cookie HttpOnly e registro persistido com token armazenado em hash.
+
+### Projetos e imagens
+
+Foram adicionados `Project`, `ProjectImage` e `SiteImage`, com migration em:
+
+```text
+backend/prisma/migrations/20260803161336_add_admin_projects_and_images/
+```
+
+O CRUD administrativo cobre criação, edição, visibilidade, exclusão definitiva, upload, descrições, capa e ordenação. Projetos iniciam ocultos.
+
+### Armazenamento local
+
+As imagens ficam em `backend/uploads/`, que é ignorado pelo Git. São aceitos JPG e PNG até 25 MB, com limite padrão de 20 imagens por projeto. O conteúdo binário, extensão e MIME type são validados. Os arquivos são acessados por endpoints de mídia que respeitam a visibilidade.
+
+### Rotas públicas
+
+```text
+GET /api/projects
+GET /api/projects/:slug
+GET /api/site-images
+GET /api/site-images/:key
+```
+
+As respostas públicas retornam somente conteúdo visível e não expõem `storageKey`.
+
+### Painel local
+
+O painel está disponível em `frontend/admin.html` e, durante o desenvolvimento, em:
+
+```text
+http://localhost:5173/admin.html
+```
+
+Ele permite login, criação e edição de projetos, publicação/ocultação, exclusão, upload, descrições, capa, ordenação e gerenciamento das chaves `home.hero`, `sobre.empresa` e `contato.banner`.
+
+### Validações realizadas
+
+- migrations e seed executados;
+- login válido e inválido;
+- proteção de rotas administrativas;
+- criação, upload de duas imagens, ordenação, capa e descrição;
+- bloqueio público de projeto e mídia ocultos;
+- publicação e consulta pública;
+- rejeição de imagem com MIME/extensão incompatíveis;
+- cadastro e remoção de imagem geral;
+- exclusão definitiva e remoção dos arquivos;
+- build do frontend com `index.html` e `admin.html`;
+- fluxo visual de login e criação de projeto no navegador local;
+- `npm audit` sem vulnerabilidades.
+
+Os registros artificiais dos testes foram removidos. O banco local mantém o administrador seed e os contatos existentes anteriormente. A administração de contatos continua planejada para uma etapa posterior.
+
 ## Estado de Git
 
 As alterações desta etapa estão no working tree da branch de desenvolvimento atual. Nenhum commit, push ou pull foi executado automaticamente. O próximo commit deve incluir o schema, a migration, o código da API, os ajustes de dependências e este arquivo de contexto.
