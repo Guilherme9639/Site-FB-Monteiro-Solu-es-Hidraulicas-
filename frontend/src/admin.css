@@ -239,12 +239,113 @@ textarea {
   border-radius: 0.75rem;
 }
 
-.site-image-card img {
+.site-image-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.site-image-heading h3 {
+  margin: 0 0 0.35rem;
+}
+
+.site-image-location,
+.site-image-key,
+.site-image-details,
+.selected-file {
+  color: #60748a;
+  font-size: 0.85rem;
+}
+
+.site-image-location,
+.site-image-details {
+  margin: 0;
+}
+
+.site-image-key {
+  flex: 0 0 auto;
+  text-align: right;
+}
+
+.site-image-preview {
+  position: relative;
+}
+
+.site-image-card img,
+.site-image-placeholder {
   width: 100%;
   aspect-ratio: 16 / 9;
   object-fit: cover;
   background: #e5edf4;
   border-radius: 0.5rem;
+}
+
+.site-image-placeholder {
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  gap: 0.35rem;
+  padding: 1rem;
+  color: #60748a;
+  text-align: center;
+}
+
+.site-image-placeholder span {
+  color: #17324d;
+  font-weight: 700;
+}
+
+.site-image-status {
+  position: absolute;
+  right: 0.5rem;
+  bottom: 0.5rem;
+  padding: 0.3rem 0.5rem;
+  color: #ffffff;
+  font-size: 0.75rem;
+  font-weight: 700;
+  background: rgb(23 50 77 / 78%);
+  border-radius: 999px;
+}
+
+.site-image-file-picker {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-width: 0;
+}
+
+.file-picker-button {
+  display: inline-block;
+  flex: 0 0 auto;
+  padding: 0.65rem 0.8rem;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.site-image-file-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  opacity: 0;
+}
+
+.selected-file {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.site-image-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+.site-image-card-feedback {
+  margin: 0;
 }
 
 .image-card img {
@@ -285,8 +386,14 @@ textarea {
 
   .dashboard-header,
   .section-heading,
-  .project-header {
+  .project-header,
+  .site-image-heading,
+  .site-image-file-picker {
     align-items: flex-start;
     flex-direction: column;
+  }
+
+  .site-image-key {
+    text-align: left;
   }
 }

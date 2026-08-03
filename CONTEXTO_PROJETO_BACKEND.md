@@ -209,6 +209,20 @@ http://localhost:5173/admin.html
 
 Ele permite login, criação e edição de projetos, publicação/ocultação, exclusão, upload, descrições, capa, ordenação e gerenciamento das chaves `home.hero`, `sobre.empresa` e `contato.banner`.
 
+### Imagens gerais do site — estado atual
+
+Foi feita uma verificação no frontend público atual (`frontend/index.html` e `frontend/src/main.js`). Não foram encontradas referências às chaves `home.hero`, `sobre.empresa` ou `contato.banner`; a landing page ainda utiliza logos estáticos. Portanto, as descrições abaixo são posições reservadas para a futura integração dinâmica, e não usos já confirmados:
+
+| Chave | Título amigável no painel | Localização documentada |
+| --- | --- | --- |
+| `home.hero` | Banner principal da página inicial | Topo da página inicial; consumo público ainda não implementado |
+| `sobre.empresa` | Imagem institucional da empresa | Seção Sobre; consumo público ainda não implementado |
+| `contato.banner` | Banner da área de contato | Área de contato; consumo público ainda não implementado |
+
+Cada cartão administrativo exibe o título amigável, a localização documentada, a chave técnica em segundo plano, preview da imagem atual ou placeholder, descrição, nome do arquivo e data de atualização quando houver. O `storageKey` não é exposto.
+
+O botão unificado `Salvar alterações` permite adicionar uma imagem, substituir a imagem existente ou alterar somente a descrição. Quando não há alterações, nenhuma requisição é enviada. A seleção de arquivo usa controle estilizado e exibe o nome do arquivo escolhido. A remoção exige confirmação e atualiza os cartões sem recarregar a página inteira. Cada cartão mantém seu próprio estado de carregamento e erro, preservando os dados digitados quando uma requisição falha.
+
 ### Validações realizadas
 
 - migrations e seed executados;

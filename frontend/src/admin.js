@@ -11,7 +11,24 @@ const projectsFeedback = document.querySelector("#projects-feedback");
 const projectsList = document.querySelector("#projects-list");
 const siteImagesList = document.querySelector("#site-images-list");
 const siteImagesFeedback = document.querySelector("#site-images-feedback");
-const SITE_IMAGE_KEYS = ["home.hero", "sobre.empresa", "contato.banner"];
+const SITE_IMAGE_SECTIONS = {
+  "home.hero": {
+    title: "Banner principal da página inicial",
+    location:
+      "Posição reservada para o topo da página inicial. O frontend público ainda não consome esta chave.",
+  },
+  "sobre.empresa": {
+    title: "Imagem institucional da empresa",
+    location:
+      "Posição reservada para a seção Sobre. O frontend público ainda não consome esta chave.",
+  },
+  "contato.banner": {
+    title: "Banner da área de contato",
+    location:
+      "Posição reservada para a área de contato. O frontend público ainda não consome esta chave.",
+  },
+};
+const SITE_IMAGE_KEYS = Object.keys(SITE_IMAGE_SECTIONS);
 
 function setFeedback(element, message, type = "") {
   element.textContent = message;
@@ -63,6 +80,18 @@ function showDashboard(user) {
 function showLogin() {
   dashboardView.hidden = true;
   loginView.hidden = false;
+}
+
+function formatDate(value) {
+  if (!value) return "Data não disponível";
+
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "Data não disponível";
+
+  return new Intl.DateTimeFormat("pt-BR", {
+    dateStyle: "short",
+    timeStyle: "short",
+  }).format(date);
 }
 
 function createProjectCard(project) {
@@ -330,76 +359,110 @@ function createProjectCard(project) {
 }
 
 function createSiteImageCard(key, image) {
+  const section = SITE_IMAGE_SECTIONS[key];
+  const fileInputId = `site-image-file-${key.replace(/[^a-z0-9]+/gi, "-")}`;
   const fileInput = createElement("input", {
+    id: fileInputId,
+    className: "site-image-file-input",
     type: "file",
     accept: "image/jpeg,image/png",
+  });
+  const selectedFile = createElement("span", {
+    className: "selected-file",
+    textContent: "Nenhum novo arquivo selecionado.",
   });
   const descriptionInput = createElement("input", {
     type: "text",
     value: image?.description || "",
-    placeholder: "Descrição da imagem",
+    placeholder: "Descrição acessível da imagem",
     maxLength: 2000,
   });
-  const uploadButton = createElement("button", {
+  const feedback = createElement("p", {
+    className: "feedback site-image-card-feedback",
+  });
+  feedback.setAttribute("aria-live", "polite");
+
+  const card = createElement("article", { className: "site-image-card" });
+  const setBusy = (isBusy) => {
+    card.querySelectorAll("button, input").forEach((element) => {
+      element.disabled = isBusy;
+    });
+  };
+
+  const saveButton = createElement("button", {
     type: "button",
-    textContent: image ? "Substituir imagem" : "Adicionar imagem",
+    textContent: "Salvar alterações",
     onclick: async () => {
-      if (!fileInput.files.length) return;
-      const formData = new FormData();
-      formData.append("image", fileInput.files[0]);
-      formData.append("description", descriptionInput.value);
+      const selectedImage = fileInput.files[0];
+      const descriptionChanged = descriptionInput.value !== (image?.description || "");
+
+      if (!selectedImage && !descriptionChanged) {
+        setFeedback(feedback, "Nenhuma alteração para salvar.");
+        return;
+      }
+
+      if (!selectedImage && !image) {
+        setFeedback(feedback, "Escolha uma imagem antes de salvar a descrição.", "error");
+        return;
+      }
+
+      setFeedback(feedback, "Salvando...");
+      setBusy(true);
 
       try {
-        await request(`/api/admin/site-images/${key}`, {
-          method: "PUT",
-          body: formData,
-        });
+        if (selectedImage) {
+          const formData = new FormData();
+          formData.append("image", selectedImage);
+          formData.append("description", descriptionInput.value);
+          await request(`/api/admin/site-images/${key}`, {
+            method: "PUT",
+            body: formData,
+          });
+        } else {
+          await request(`/api/admin/site-images/${image.id}`, {
+            method: "PATCH",
+            headers: { "content-type": "application/json" },
+            body: JSON.stringify({ description: descriptionInput.value }),
+          });
+        }
+
         await loadSiteImages();
       } catch (error) {
-        setFeedback(siteImagesFeedback, error.message, "error");
+        setBusy(false);
+        setFeedback(feedback, error.message, "error");
       }
     },
   });
-  const saveButton = image
-    ? createElement("button", {
-        type: "button",
-        className: "secondary-button",
-        textContent: "Salvar descrição",
-        onclick: async () => {
-          try {
-            await request(`/api/admin/site-images/${image.id}`, {
-              method: "PATCH",
-              headers: { "content-type": "application/json" },
-              body: JSON.stringify({ description: descriptionInput.value }),
-            });
-            await loadSiteImages();
-          } catch (error) {
-            setFeedback(siteImagesFeedback, error.message, "error");
-          }
-        },
-      })
-    : null;
+
   const deleteButton = image
     ? createElement("button", {
         type: "button",
         className: "danger-button",
-        textContent: "Remover",
+        textContent: "Remover imagem",
         onclick: async () => {
+          if (!window.confirm(`Remover a imagem de “${section.title}”?`)) return;
+
+          setFeedback(feedback, "Removendo...");
+          setBusy(true);
           try {
             await request(`/api/admin/site-images/${image.id}`, { method: "DELETE" });
             await loadSiteImages();
           } catch (error) {
-            setFeedback(siteImagesFeedback, error.message, "error");
+            setBusy(false);
+            setFeedback(feedback, error.message, "error");
           }
         },
-    })
+      })
     : null;
+
   const visibilityButton = image
     ? createElement("button", {
         type: "button",
         className: "secondary-button",
         textContent: image.isVisible ? "Ocultar" : "Publicar",
         onclick: async () => {
+          setFeedback(feedback, "Atualizando visibilidade...");
+          setBusy(true);
           try {
             await request(`/api/admin/site-images/${image.id}`, {
               method: "PATCH",
@@ -408,28 +471,81 @@ function createSiteImageCard(key, image) {
             });
             await loadSiteImages();
           } catch (error) {
-            setFeedback(siteImagesFeedback, error.message, "error");
+            setBusy(false);
+            setFeedback(feedback, error.message, "error");
           }
         },
       })
     : null;
-  const children = [createElement("strong", { textContent: key })];
 
-  if (image) {
-    children.push(
-      createElement("img", {
-        src: `${API_BASE}${image.url}`,
-        alt: image.description || key,
+  fileInput.addEventListener("change", () => {
+    selectedFile.textContent = fileInput.files[0]
+      ? fileInput.files[0].name
+      : "Nenhum novo arquivo selecionado.";
+  });
+
+  const preview = image
+    ? createElement("div", { className: "site-image-preview" }, [
+        createElement("img", {
+          src: `${API_BASE}${image.url}`,
+          alt: image.description || section.title,
+        }),
+        createElement("span", {
+          className: "site-image-status",
+          textContent: "Imagem atual",
+        }),
+      ])
+    : createElement("div", { className: "site-image-placeholder" }, [
+        createElement("span", { textContent: "Sem imagem" }),
+        createElement("small", {
+          textContent: "Nenhuma imagem cadastrada para esta seção.",
+        }),
+      ]);
+
+  const details = image
+    ? createElement("small", {
+        className: "site-image-details",
+        textContent: `${image.originalName || "Arquivo local"} · Atualizada em ${formatDate(image.updatedAt)}`,
+      })
+    : null;
+
+  const filePicker = createElement("div", { className: "site-image-file-picker" }, [
+    createElement("label", {
+      className: "file-picker-button secondary-button",
+      htmlFor: fileInputId,
+      textContent: image ? "Escolher imagem para substituir" : "Escolher imagem",
+    }),
+    fileInput,
+    selectedFile,
+  ]);
+  const actions = createElement("div", { className: "site-image-actions" }, [saveButton]);
+  if (visibilityButton) actions.append(visibilityButton);
+  if (deleteButton) actions.append(deleteButton);
+
+  const heading = createElement("div", { className: "site-image-heading" }, [
+    createElement("div", {}, [
+      createElement("h3", { textContent: section.title }),
+      createElement("p", {
+        className: "site-image-location",
+        textContent: section.location,
       }),
-    );
-  }
+    ]),
+    createElement("small", {
+      className: "site-image-key",
+      textContent: `Chave interna: ${key}`,
+    }),
+  ]);
 
-  children.push(descriptionInput, fileInput, uploadButton);
-  if (saveButton) children.push(saveButton);
-  if (visibilityButton) children.push(visibilityButton);
-  if (deleteButton) children.push(deleteButton);
+  card.append(heading, preview);
+  if (details) card.append(details);
+  card.append(
+    createElement("label", { textContent: "Descrição" }, [descriptionInput]),
+    filePicker,
+    actions,
+    feedback,
+  );
 
-  return createElement("article", { className: "site-image-card" }, children);
+  return card;
 }
 
 async function loadSiteImages() {
