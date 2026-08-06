@@ -11,6 +11,7 @@ export default defineConfig({
         main: resolve(directory, "index.html"),
         admin: resolve(directory, "admin.html"),
         sobre: resolve(directory, "sobre.html"),
+        contato: resolve(directory, "contato.html"),
       },
     },
   },

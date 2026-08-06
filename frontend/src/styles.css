@@ -301,6 +301,35 @@ main {
   margin: 0 auto;
 }
 
+.contact-cta {
+  width: min(100%, 850px);
+  margin: 0 auto;
+  text-align: center;
+}
+
+.contact-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.contact-page-section {
+  min-height: calc(100vh - 150px);
+  display: grid;
+  align-items: center;
+}
+
+.contact-page-section .contact-intro h1 {
+  margin: 0;
+  font-size: clamp(2rem, 4vw, 3.5rem);
+}
+
+.contact-page-section .contact-intro .primary-button {
+  margin-top: 1rem;
+}
+
 .section-label {
   display: inline-block;
   margin-bottom: 1rem;
@@ -444,6 +473,11 @@ main {
   .contact-content {
     grid-template-columns: 1fr;
     gap: 2rem;
+  }
+
+  .contact-actions {
+    flex-direction: column;
+    align-items: center;
   }
 
   .founder-story {
