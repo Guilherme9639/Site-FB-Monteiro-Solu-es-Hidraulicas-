@@ -226,6 +226,40 @@ main {
   line-height: 1.7;
 }
 
+.founder-story {
+  display: grid;
+  grid-template-columns: 1.5fr 0.8fr;
+  gap: 3rem;
+  align-items: start;
+  width: min(100%, 1050px);
+  margin: 0 auto 4rem;
+}
+
+.founder-story-content h2 {
+  margin: 0 0 1.25rem;
+  color: #0b2545;
+  font-size: clamp(1.75rem, 3vw, 2.5rem);
+}
+
+.founder-story-content p,
+.founder-specialty p {
+  color: #506176;
+  line-height: 1.7;
+}
+
+.founder-specialty {
+  padding: 2rem;
+  background: #f6f8fa;
+  border-left: 4px solid #f26a2e;
+  border-radius: 0.75rem;
+}
+
+.founder-specialty h3 {
+  margin: 0;
+  color: #0b2545;
+  font-size: 1.5rem;
+}
+
 .projects-subsection {
   padding: 4rem clamp(1rem, 4vw, 4rem);
   background: #f6f8fa;
@@ -410,6 +444,11 @@ main {
   .contact-content {
     grid-template-columns: 1fr;
     gap: 2rem;
+  }
+
+  .founder-story {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
   }
 
   .contact-intro {
