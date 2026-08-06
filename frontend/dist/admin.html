@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Painel administrativo local da FB Monteiro." />
+    <title>Painel administrativo | FB Monteiro</title>
+    <script type="module" crossorigin src="/assets/admin-QkHFjm6i.js"></script>
+    <link rel="modulepreload" crossorigin href="/assets/modulepreload-polyfill-B5Qt9EMX.js">
+    <link rel="stylesheet" crossorigin href="/assets/admin-vIJdUM3L.css">
+  </head>
+
+  <body>
+    <main class="admin-shell">
+      <section id="login-view" class="panel-card login-card">
+        <p class="eyebrow">FB Monteiro</p>
+        <h1>Painel administrativo</h1>
+        <p>Entre para gerenciar projetos e imagens do site.</p>
+
+        <form id="login-form" class="stack-form">
+          <label>
+            E-mail
+            <input id="login-email" type="email" autocomplete="username" required />
+          </label>
+          <label>
+            Senha
+            <input id="login-password" type="password" autocomplete="current-password" required />
+          </label>
+          <button type="submit">Entrar</button>
+          <p id="login-feedback" class="feedback" aria-live="polite"></p>
+        </form>
+      </section>
+
+      <section id="dashboard-view" class="dashboard" hidden>
+        <header class="dashboard-header">
+          <div>
+            <p class="eyebrow">Conteúdo local</p>
+            <h1>Projetos realizados</h1>
+            <p id="current-user"></p>
+          </div>
+          <button id="logout-button" class="secondary-button" type="button">Sair</button>
+        </header>
+
+        <section class="panel-card">
+          <h2>Novo projeto</h2>
+          <form id="project-form" class="stack-form">
+            <label>
+              Título
+              <input id="project-title" type="text" minlength="3" maxlength="160" required />
+            </label>
+            <label>
+              Descrição
+              <textarea id="project-description" rows="4" maxlength="5000"></textarea>
+            </label>
+            <button type="submit">Criar projeto</button>
+            <p id="project-feedback" class="feedback" aria-live="polite"></p>
+          </form>
+        </section>
+
+        <section>
+          <div class="section-heading">
+            <h2>Projetos cadastrados</h2>
+            <button id="refresh-button" class="secondary-button" type="button">Atualizar</button>
+          </div>
+          <div id="projects-list" class="projects-list"></div>
+          <p id="projects-feedback" class="feedback" aria-live="polite"></p>
+        </section>
+
+        <section class="panel-card site-images-section">
+          <div class="section-heading">
+            <div>
+              <h2>Imagens gerais do site</h2>
+              <p>As imagens são organizadas por chaves fixas de seção.</p>
+            </div>
+            <button id="refresh-site-images-button" class="secondary-button" type="button">Atualizar</button>
+          </div>
+          <div id="site-images-list" class="site-images-list"></div>
+          <p id="site-images-feedback" class="feedback" aria-live="polite"></p>
+        </section>
+      </section>
+    </main>
+
+  </body>
+</html>
