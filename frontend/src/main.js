@@ -56,3 +56,18 @@ contactForm.addEventListener("submit", async (event) => {
     submitButton.textContent = "Enviar solicitação";
   }
 });
+const featuredProjects = [
+  {
+    name: "Obra Ricam - Padre Eustaquio - BH - MG",
+    description: "Prédio completo com 6 pavimentos, prevenção de incêndio, esgoto, agua quente e fria.",
+    cover: "images/obras/ricam/capa.jpeg",
+    images: [
+      "images/obras/ricam/1.jpeg",
+      "images/obras/ricam/2.jpeg",
+      "images/obras/ricam/3.jpeg",
+    ],
+  },
+];
+function showProject() {
+  console.log(featuredProjects);
+}
