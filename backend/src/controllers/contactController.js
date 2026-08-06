@@ -1,32 +1,53 @@
-import { randomUUID } from "node:crypto";
-import contacts from "../data/contacts.js";
+import { prisma } from "../lib/prisma.js";
 
-export function createContact(request, response) {
-  const { name, phone, message } = request.body;
+export async function createContact(request, response, next) {
+  const { name, phone, message } = request.body ?? {};
+  const normalizedName = name?.trim();
+  const normalizedPhone = phone?.trim();
+  const normalizedMessage = message?.trim();
 
-  if (!name?.trim() || !phone?.trim() || !message?.trim()) {
+  if (!normalizedName || !normalizedPhone || !normalizedMessage) {
     return response.status(400).json({
       message: "Nome, telefone e mensagem são obrigatórios.",
     });
   }
 
-  const contact = {
-    id: randomUUID(),
-    name: name.trim(),
-    phone: phone.trim(),
-    message: message.trim(),
-    status: "pending",
-    createdAt: new Date().toISOString(),
-  };
+  if (normalizedName.length > 120) {
+    return response.status(400).json({
+      message: "O nome deve ter no máximo 120 caracteres.",
+    });
+  }
 
-  contacts.push(contact);
+  if (normalizedPhone.length > 30) {
+    return response.status(400).json({
+      message: "O telefone deve ter no máximo 30 caracteres.",
+    });
+  }
 
-  return response.status(201).json({
-    message: "Solicitação enviada com sucesso!",
-    contact,
-  });
-}
+  if (normalizedMessage.length > 2000) {
+    return response.status(400).json({
+      message: "A mensagem deve ter no máximo 2000 caracteres.",
+    });
+  }
 
-export function listContacts(request, response) {
-  return response.status(200).json(contacts);
+  try {
+    const contact = await prisma.contact.create({
+      data: {
+        name: normalizedName,
+        phone: normalizedPhone,
+        message: normalizedMessage,
+      },
+      select: {
+        id: true,
+        createdAt: true,
+      },
+    });
+
+    return response.status(201).json({
+      message: "Solicitação enviada com sucesso!",
+      contact,
+    });
+  } catch (error) {
+    return next(error);
+  }
 }
