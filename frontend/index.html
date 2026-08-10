@@ -20,8 +20,8 @@
 
         <nav aria-label="Navegação principal">
           <a href="#inicio">Início</a>
-          <a href="#sobre">Sobre</a>
-          <a href="#contato">Contato</a>
+          <a href="/sobre.html">Sobre</a>
+          <a href="/contato.html">Contato</a>
         </nav>
 
         <a
@@ -60,69 +60,34 @@
               Solicitar orçamento
             </a>
 
-            <a class="secondary-button" href="#sobre">Conheça a empresa</a>
+            <a class="secondary-button" href="/sobre.html">Conheça a empresa</a>
           </div>
         </div>
 
-        <div class="hero-visual" aria-hidden="true">
-          <img src="/images/logo-fb-monteiro.png" alt="" />
+        <div id="project-carousel" class="project-carousel hero-project-carousel" aria-live="polite">
+          <p class="carousel-status">Carregando obra...</p>
         </div>
       </section>
 
       <section id="contato" class="contact-section">
-        <div class="contact-content">
+        <div class="contact-cta">
           <div class="contact-intro">
             <span class="section-label">Entre em contato</span>
-            <h2>Solicite seu orçamento</h2>
+            <h2>Fale diretamente com a FB Monteiro</h2>
             <p>
-              Conte brevemente o serviço de que precisa. A FB Monteiro entrará
-              em contato para entender sua necessidade.
+              Para um atendimento mais rápido, fale conosco pelo WhatsApp e
+              explique o que você precisa.
             </p>
           </div>
 
-          <form id="contact-form" class="contact-form">
-            <div class="form-field">
-              <label for="name">Nome</label>
-              <input
-                id="name"
-                name="name"
-                type="text"
-                autocomplete="name"
-                required
-              />
-            </div>
-
-            <div class="form-field">
-              <label for="phone">Telefone ou WhatsApp</label>
-              <input
-                id="phone"
-                name="phone"
-                type="tel"
-                autocomplete="tel"
-                required
-              />
-            </div>
-
-            <div class="form-field">
-              <label for="message">Como podemos ajudar?</label>
-              <textarea
-                id="message"
-                name="message"
-                rows="5"
-                required
-              ></textarea>
-            </div>
-
-            <button class="submit-button" type="submit">
-              Enviar solicitação
-            </button>
-
-            <p
-              id="form-feedback"
-              class="form-feedback"
-              aria-live="polite"
-            ></p>
-          </form>
+          <div class="contact-actions">
+            <a class="primary-button" href="https://wa.me/5531984879622" target="_blank" rel="noopener noreferrer">
+              Falar pelo WhatsApp
+            </a>
+            <a class="secondary-button contact-form-link" href="/contato.html">
+              Prefiro preencher o formulário
+            </a>
+          </div>
         </div>
       </section>
     </main>

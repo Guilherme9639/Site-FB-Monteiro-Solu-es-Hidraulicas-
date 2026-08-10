@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Entre em contato com a FB Monteiro." />
+    <title>FB Monteiro | Contato</title>
+    <link rel="stylesheet" href="/src/styles.css" />
+  </head>
+
+  <body>
+    <header class="site-header">
+      <div class="header-content">
+        <a href="/" class="logo">
+          <img src="/images/logo-fb-monteiro-horizontal.png" alt="FB Monteiro Soluções Hidráulicas" />
+        </a>
+
+        <nav aria-label="Navegação principal">
+          <a href="/">Início</a>
+          <a href="/sobre.html">Sobre</a>
+          <a href="/contato.html" aria-current="page">Contato</a>
+        </nav>
+
+        <a class="whatsapp-button" href="https://wa.me/5531984879622" target="_blank" rel="noopener noreferrer">
+          Solicitar orçamento
+        </a>
+      </div>
+    </header>
+
+    <main>
+      <section class="contact-section contact-page-section">
+        <div class="contact-content">
+          <div class="contact-intro">
+            <span class="section-label">Formulário de contato</span>
+            <h1>Envie sua solicitação</h1>
+            <p>
+              Se preferir, descreva o serviço que você precisa. A FB Monteiro
+              entrará em contato para entender sua necessidade.
+            </p>
+            <a class="primary-button" href="https://wa.me/5531984879622" target="_blank" rel="noopener noreferrer">
+              Falar diretamente pelo WhatsApp
+            </a>
+          </div>
+
+          <form id="contact-form" class="contact-form">
+            <div class="form-field">
+              <label for="name">Nome</label>
+              <input id="name" name="name" type="text" autocomplete="name" required />
+            </div>
+
+            <div class="form-field">
+              <label for="phone">Telefone ou WhatsApp</label>
+              <input id="phone" name="phone" type="tel" autocomplete="tel" required />
+            </div>
+
+            <div class="form-field">
+              <label for="message">Como podemos ajudar?</label>
+              <textarea id="message" name="message" rows="5" required></textarea>
+            </div>
+
+            <button class="submit-button" type="submit">Enviar solicitação</button>
+            <p id="form-feedback" class="form-feedback" aria-live="polite"></p>
+          </form>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <p>FB Monteiro Soluções Hidráulicas</p>
+    </footer>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
