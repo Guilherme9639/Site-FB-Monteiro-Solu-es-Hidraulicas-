@@ -318,12 +318,13 @@ textarea {
 
 .site-images-list {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 1rem;
 }
 
 .site-image-card {
   display: grid;
+  align-content: start;
   gap: 0.75rem;
   padding: 1rem;
   border: 1px solid #dce6ee;
@@ -332,13 +333,14 @@ textarea {
 
 .site-image-heading {
   display: flex;
+  min-height: 4.25rem;
   align-items: flex-start;
-  justify-content: space-between;
-  gap: 0.75rem;
+  justify-content: center;
+  text-align: center;
 }
 
 .site-image-heading h3 {
-  margin: 0 0 0.35rem;
+  margin: 0;
 }
 
 .site-image-location,
@@ -366,6 +368,7 @@ textarea {
 .site-image-card img,
 .site-image-placeholder {
   width: 100%;
+  min-height: 12rem;
   aspect-ratio: 16 / 9;
   object-fit: cover;
   background: #e5edf4;
@@ -436,7 +439,21 @@ textarea {
 }
 
 .site-image-card-feedback {
+  min-height: 1.25rem;
   margin: 0;
+}
+
+.site-image-card > label {
+  min-height: 4.65rem;
+}
+
+.site-image-file-picker {
+  min-height: 2.6rem;
+}
+
+.site-image-actions {
+  min-height: 3rem;
+  align-items: flex-start;
 }
 
 .image-card img {
@@ -681,6 +698,10 @@ textarea {
 
   .site-image-key {
     text-align: left;
+  }
+
+  .site-images-list {
+    grid-template-columns: 1fr;
   }
 
   .project-editor-toolbar {

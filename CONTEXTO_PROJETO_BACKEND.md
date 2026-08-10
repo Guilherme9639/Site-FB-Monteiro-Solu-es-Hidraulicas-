@@ -414,6 +414,19 @@ rodapé fixo do modal, sempre acessíveis durante a rolagem.
 - grade de quatro colunas e rolagem interna confirmadas na estrutura dos modais;
 - nenhuma alteração de backend, schema ou regras de negócio realizada.
 
+## Atualizacao — alinhamento das imagens gerais do site
+
+Data: 10/08/2026
+
+Os cards de `Imagens gerais do site` foram simplificados: o painel não exibe
+mais a descrição de localização abaixo do título nem a mensagem `Chave interna`.
+Os títulos ficam centralizados e a grade usa três colunas iguais em telas largas.
+
+Foram adicionadas alturas mínimas consistentes para título, preview, descrição,
+seletor de arquivo, ações e feedback, mantendo os campos das três seções
+alinhados mesmo quando os títulos possuem quantidades diferentes de linhas. Em
+telas menores a grade se adapta para uma coluna.
+
 ## Estado de Git
 
 As alterações desta etapa estão no working tree da branch de desenvolvimento atual. Nenhum commit, push ou pull foi executado automaticamente. O próximo commit deve incluir o schema, a migration, o código da API, os ajustes de dependências e este arquivo de contexto.

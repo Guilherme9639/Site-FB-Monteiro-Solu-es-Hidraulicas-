@@ -596,17 +596,7 @@ function createSiteImageCard(key, image) {
   if (deleteButton) actions.append(deleteButton);
 
   const heading = createElement("div", { className: "site-image-heading" }, [
-    createElement("div", {}, [
-      createElement("h3", { textContent: section.title }),
-      createElement("p", {
-        className: "site-image-location",
-        textContent: section.location,
-      }),
-    ]),
-    createElement("small", {
-      className: "site-image-key",
-      textContent: `Chave interna: ${key}`,
-    }),
+    createElement("h3", { textContent: section.title }),
   ]);
 
   card.append(heading, preview);
