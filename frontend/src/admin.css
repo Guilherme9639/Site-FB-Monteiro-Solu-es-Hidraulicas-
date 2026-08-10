@@ -151,9 +151,82 @@ textarea {
   margin: 2rem 0 1rem;
 }
 
+.section-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
 .projects-list {
   display: grid;
-  gap: 1.25rem;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1rem;
+}
+
+.project-summary-card {
+  display: grid;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 0.75rem;
+  color: #17324d;
+  text-align: left;
+  background: #ffffff;
+  border: 1px solid #dce6ee;
+  border-radius: 0.85rem;
+  box-shadow: 0 0.5rem 1.25rem rgb(23 50 77 / 7%);
+}
+
+.project-summary-card:hover,
+.project-summary-card:focus-visible {
+  color: #17324d;
+  background: #eef7fb;
+  border-color: #086b9c;
+}
+
+.project-summary-card img,
+.project-summary-placeholder {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  background: #e5edf4;
+  border-radius: 0.6rem;
+}
+
+.project-summary-placeholder {
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  color: #60748a;
+}
+
+.project-summary-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.project-summary-content h3 {
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.project-editor-section {
+  margin-top: 1rem;
+}
+
+.project-editor-card {
+  margin-top: 1rem;
+}
+
+.project-empty-gallery {
+  padding: 1rem;
+  color: #60748a;
+  text-align: center;
+  background: #f4f8fb;
+  border-radius: 0.6rem;
 }
 
 .project-card {
@@ -386,6 +459,16 @@ textarea {
   width: auto;
 }
 
+.checkbox-option {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.checkbox-option input {
+  width: auto;
+}
+
 .work-carousel-view {
   display: grid;
   gap: 1rem;
@@ -509,6 +592,10 @@ textarea {
   gap: 0.75rem;
 }
 
+.project-create-modal {
+  width: min(92vw, 620px);
+}
+
 .image-actions {
   justify-content: flex-start;
   flex-wrap: wrap;
@@ -535,6 +622,7 @@ textarea {
 
   .dashboard-header,
   .section-heading,
+  .section-actions,
   .project-header,
   .site-image-heading,
   .site-image-file-picker,

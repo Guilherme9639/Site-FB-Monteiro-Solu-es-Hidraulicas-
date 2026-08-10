@@ -5,9 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content="Painel administrativo local da FB Monteiro." />
     <title>Painel administrativo | FB Monteiro</title>
-    <script type="module" crossorigin src="/assets/admin-DZzkKR1h.js"></script>
+    <script type="module" crossorigin src="/assets/admin-BOttJVqS.js"></script>
     <link rel="modulepreload" crossorigin href="/assets/modulepreload-polyfill-B5Qt9EMX.js">
-    <link rel="stylesheet" crossorigin href="/assets/admin-Pgi0Qgiw.css">
+    <link rel="stylesheet" crossorigin href="/assets/admin-DdiRbO_e.css">
   </head>
 
   <body>
@@ -41,29 +41,31 @@
           <button id="logout-button" class="secondary-button" type="button">Sair</button>
         </header>
 
-        <section class="panel-card">
-          <h2>Novo projeto</h2>
-          <form id="project-form" class="stack-form">
-            <label>
-              Título
-              <input id="project-title" type="text" minlength="3" maxlength="160" required />
-            </label>
-            <label>
-              Descrição
-              <textarea id="project-description" rows="4" maxlength="5000"></textarea>
-            </label>
-            <button type="submit">Criar projeto</button>
-            <p id="project-feedback" class="feedback" aria-live="polite"></p>
-          </form>
-        </section>
-
-        <section>
+        <section id="projects-browser-section" class="projects-browser-section">
           <div class="section-heading">
-            <h2>Projetos cadastrados</h2>
-            <button id="refresh-button" class="secondary-button" type="button">Atualizar</button>
+            <div>
+              <h2>Projetos cadastrados</h2>
+              <p>Selecione um projeto para editar seus dados e imagens.</p>
+            </div>
+            <div class="section-actions">
+              <button id="open-project-create-modal" type="button">Criar novo projeto</button>
+              <button id="refresh-button" class="secondary-button" type="button">Atualizar</button>
+            </div>
           </div>
           <div id="projects-list" class="projects-list"></div>
           <p id="projects-feedback" class="feedback" aria-live="polite"></p>
+        </section>
+
+        <section id="project-editor-section" class="project-editor-section" hidden>
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">Projeto selecionado</p>
+              <h2>Editar projeto</h2>
+            </div>
+            <button id="back-to-projects-button" class="secondary-button" type="button">Voltar aos projetos</button>
+          </div>
+          <div id="project-editor"></div>
+          <p id="project-editor-feedback" class="feedback" aria-live="polite"></p>
         </section>
 
         <section class="panel-card site-images-section">
@@ -103,7 +105,11 @@
           <div id="work-carousel-custom-view" class="work-carousel-view" hidden>
             <div class="image-upload">
               <strong>Imagens personalizadas</strong>
-              <input id="work-carousel-file-input" type="file" accept="image/jpeg,image/png" multiple />
+              <div class="site-image-file-picker">
+                <label class="file-picker-button secondary-button" for="work-carousel-file-input">Escolher imagens</label>
+                <input id="work-carousel-file-input" class="site-image-file-input" type="file" accept="image/jpeg,image/png" multiple />
+                <span id="work-carousel-selected-files" class="selected-file">Nenhum novo arquivo selecionado.</span>
+              </div>
             </div>
             <div id="work-carousel-images-list" class="image-list"></div>
             <p id="work-carousel-custom-feedback" class="feedback" aria-live="polite"></p>
@@ -118,6 +124,35 @@
         </section>
       </section>
     </main>
+
+    <dialog id="project-create-modal" class="project-selector-modal project-create-modal" aria-labelledby="project-create-title">
+      <form id="project-form" method="dialog" class="project-selector-content">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Projetos cadastrados</p>
+            <h2 id="project-create-title">Criar novo projeto</h2>
+          </div>
+          <button class="secondary-button modal-close-button" value="cancel" type="submit" aria-label="Fechar">×</button>
+        </div>
+        <label>
+          Título
+          <input id="project-title" type="text" minlength="3" maxlength="160" required />
+        </label>
+        <label>
+          Descrição
+          <textarea id="project-description" rows="4" maxlength="5000"></textarea>
+        </label>
+        <label class="checkbox-option">
+          <input id="project-visible" type="checkbox" />
+          <span>Criar projeto publicado/visível</span>
+        </label>
+        <p id="project-feedback" class="feedback" aria-live="polite"></p>
+        <div class="modal-actions">
+          <button class="secondary-button" value="cancel" type="submit">Cancelar</button>
+          <button type="submit">Criar projeto</button>
+        </div>
+      </form>
+    </dialog>
 
     <dialog id="project-selector-modal" class="project-selector-modal" aria-labelledby="project-selector-title">
       <form method="dialog" class="project-selector-content">

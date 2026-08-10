@@ -5,8 +5,14 @@ const dashboardView = document.querySelector("#dashboard-view");
 const loginForm = document.querySelector("#login-form");
 const loginFeedback = document.querySelector("#login-feedback");
 const currentUser = document.querySelector("#current-user");
+const projectsBrowserSection = document.querySelector("#projects-browser-section");
 const projectForm = document.querySelector("#project-form");
 const projectFeedback = document.querySelector("#project-feedback");
+const projectVisibleInput = document.querySelector("#project-visible");
+const projectCreateModal = document.querySelector("#project-create-modal");
+const projectEditorSection = document.querySelector("#project-editor-section");
+const projectEditor = document.querySelector("#project-editor");
+const projectEditorFeedback = document.querySelector("#project-editor-feedback");
 const projectsFeedback = document.querySelector("#projects-feedback");
 const projectsList = document.querySelector("#projects-list");
 const siteImagesList = document.querySelector("#site-images-list");
@@ -15,6 +21,7 @@ const workCarouselCustomView = document.querySelector("#work-carousel-custom-vie
 const workCarouselProjectView = document.querySelector("#work-carousel-project-view");
 const workCarouselImagesList = document.querySelector("#work-carousel-images-list");
 const workCarouselFileInput = document.querySelector("#work-carousel-file-input");
+const workCarouselSelectedFiles = document.querySelector("#work-carousel-selected-files");
 const workCarouselCustomFeedback = document.querySelector("#work-carousel-custom-feedback");
 const workCarouselSelectedProject = document.querySelector("#work-carousel-selected-project");
 const workCarouselProjectFeedback = document.querySelector("#work-carousel-project-feedback");
@@ -25,6 +32,7 @@ const projectSelectorList = document.querySelector("#project-selector-list");
 const projectSelectorFeedback = document.querySelector("#project-selector-feedback");
 const projectSelectorSaveButton = document.querySelector("#save-project-selection");
 let projectsCache = [];
+let selectedProjectId = null;
 let workCarouselConfig = null;
 let selectedProjectDraftId = null;
 let workCarouselUploadInProgress = false;
@@ -111,26 +119,37 @@ function formatDate(value) {
   }).format(date);
 }
 
-function createProjectCard(project) {
-  const title = createElement("h3", { textContent: project.title });
-  const meta = createElement("p", {
-    className: "project-meta",
-    textContent: `Slug: ${project.slug} · ${project.images.length} imagem(ns)`,
+function createProjectSummaryCard(project) {
+  const cover = getProjectCover(project);
+  const card = createElement("button", {
+    type: "button",
+    className: "project-summary-card",
+    onclick: () => selectProject(project.id),
   });
-  const badge = createElement("span", {
-    className: `visibility-badge${project.isVisible ? "" : " hidden-badge"}`,
-    textContent: project.isVisible ? "Visível" : "Oculto",
-  });
-  const header = createElement("div", { className: "project-header" }, [
-    createElement("div", {}, [title, meta]),
-    badge,
-  ]);
+  card.setAttribute("aria-label", `Editar projeto ${project.title}`);
+  card.append(
+    cover
+      ? createElement("img", {
+          src: `${API_BASE}${cover.url}`,
+          alt: cover.description || project.title,
+        })
+      : createElement("div", { className: "project-summary-placeholder", textContent: "Sem capa" }),
+    createElement("div", { className: "project-summary-content" }, [
+      createElement("h3", { textContent: project.title }),
+      createElement("span", {
+        className: `visibility-badge${project.isVisible ? "" : " hidden-badge"}`,
+        textContent: project.isVisible ? "Visível" : "Oculto",
+      }),
+    ]),
+  );
+  return card;
+}
 
-  const description = createElement("p", {
-    className: "project-description",
-    textContent: project.description || "Sem descrição.",
-  });
+function renderProjectsBrowser() {
+  projectsList.replaceChildren(...projectsCache.map(createProjectSummaryCard));
+}
 
+function createProjectEditor(project) {
   const titleInput = createElement("input", {
     type: "text",
     value: project.title,
@@ -138,7 +157,7 @@ function createProjectCard(project) {
     maxLength: 160,
   });
   const descriptionInput = createElement("textarea", {
-    rows: 3,
+    rows: 4,
     value: project.description || "",
     maxLength: 5000,
   });
@@ -151,27 +170,20 @@ function createProjectCard(project) {
         await request(`/api/admin/projects/${project.id}`, {
           method: "PATCH",
           headers: { "content-type": "application/json" },
-          body: JSON.stringify({
-            title: titleInput.value,
-            description: descriptionInput.value,
-          }),
+          body: JSON.stringify({ title: titleInput.value, description: descriptionInput.value }),
         });
         await loadProjects();
+        setFeedback(projectEditorFeedback, "Projeto atualizado.", "success");
       } catch (error) {
-        setFeedback(projectsFeedback, error.message, "error");
+        setFeedback(projectEditorFeedback, error.message, "error");
       }
     },
   });
-  const editForm = createElement("div", { className: "stack-form" }, [
-    createElement("label", { textContent: "Título" }, [titleInput]),
-    createElement("label", { textContent: "Descrição" }, [descriptionInput]),
-    saveProjectButton,
-  ]);
 
   const visibilityButton = createElement("button", {
     className: "secondary-button",
     type: "button",
-    textContent: project.isVisible ? "Ocultar" : "Publicar",
+    textContent: project.isVisible ? "Ocultar projeto" : "Publicar projeto",
     onclick: async () => {
       try {
         await request(`/api/admin/projects/${project.id}/visibility`, {
@@ -180,70 +192,84 @@ function createProjectCard(project) {
           body: JSON.stringify({ isVisible: !project.isVisible }),
         });
         await loadProjects();
+        setFeedback(projectEditorFeedback, project.isVisible ? "Projeto ocultado." : "Projeto publicado.", "success");
       } catch (error) {
-        setFeedback(projectsFeedback, error.message, "error");
+        setFeedback(projectEditorFeedback, error.message, "error");
       }
     },
   });
-
   const deleteButton = createElement("button", {
     className: "danger-button",
     type: "button",
     textContent: "Excluir definitivamente",
     onclick: async () => {
       if (!window.confirm(`Excluir definitivamente “${project.title}”?`)) return;
-
       try {
         await request(`/api/admin/projects/${project.id}`, { method: "DELETE" });
+        selectedProjectId = null;
         await loadProjects();
+        setFeedback(projectsFeedback, "Projeto excluído.", "success");
       } catch (error) {
-        setFeedback(projectsFeedback, error.message, "error");
+        setFeedback(projectEditorFeedback, error.message, "error");
       }
     },
   });
 
-  const actions = createElement("div", { className: "project-actions" }, [
-    visibilityButton,
-    deleteButton,
-  ]);
-
+  const fileInputId = `project-image-file-${project.id}`;
   const fileInput = createElement("input", {
+    id: fileInputId,
+    className: "site-image-file-input",
     type: "file",
     accept: "image/jpeg,image/png",
     multiple: true,
   });
-  const uploadButton = createElement("button", {
-    type: "button",
-    textContent: "Adicionar imagens",
-    onclick: async () => {
-      if (!fileInput.files.length) return;
-      const formData = new FormData();
-      for (const file of fileInput.files) formData.append("images", file);
-
-      try {
-        await request(`/api/admin/projects/${project.id}/images`, {
-          method: "POST",
-          body: formData,
-        });
-        fileInput.value = "";
-        await loadProjects();
-      } catch (error) {
-        setFeedback(projectsFeedback, error.message, "error");
-      }
-    },
+  const selectedFiles = createElement("span", {
+    className: "selected-file",
+    textContent: "Nenhum novo arquivo selecionado.",
+  });
+  let uploadInProgress = false;
+  fileInput.addEventListener("change", async () => {
+    if (uploadInProgress || !fileInput.files.length) return;
+    uploadInProgress = true;
+    const files = [...fileInput.files];
+    selectedFiles.textContent = files.map((file) => file.name).join(", ");
+    fileInput.disabled = true;
+    setFeedback(projectEditorFeedback, "Enviando imagens...");
+    const formData = new FormData();
+    files.forEach((file) => formData.append("images", file));
+    try {
+      await request(`/api/admin/projects/${project.id}/images`, {
+        method: "POST",
+        body: formData,
+      });
+      fileInput.value = "";
+      await loadProjects();
+      setFeedback(projectEditorFeedback, "Imagens adicionadas automaticamente.", "success");
+    } catch (error) {
+      setFeedback(projectEditorFeedback, error.message, "error");
+      fileInput.disabled = false;
+      uploadInProgress = false;
+    }
   });
   const imageUpload = createElement("div", { className: "image-upload" }, [
-    createElement("strong", { textContent: "Galeria" }),
-    fileInput,
-    uploadButton,
+    createElement("strong", { textContent: "Galeria do projeto" }),
+    createElement("div", { className: "site-image-file-picker" }, [
+      createElement("label", {
+        className: "file-picker-button secondary-button",
+        htmlFor: fileInputId,
+        textContent: "Escolher imagens",
+      }),
+      fileInput,
+      selectedFiles,
+    ]),
+    createElement("small", { className: "selected-file", textContent: "O envio começa automaticamente após a seleção." }),
   ]);
 
   const imageList = createElement("div", { className: "image-list" });
+  if (!project.images.length) {
+    imageList.append(createElement("p", { className: "project-empty-gallery", textContent: "Nenhuma imagem cadastrada neste projeto." }));
+  }
   for (const image of project.images) {
-    const imageElement = createElement("img", {
-      src: `${API_BASE}${image.url}`,
-      alt: image.description || project.title,
-    });
     const descriptionInput = createElement("input", {
       type: "text",
       value: image.description || "",
@@ -262,8 +288,9 @@ function createProjectCard(project) {
             body: JSON.stringify({ description: descriptionInput.value }),
           });
           await loadProjects();
+          setFeedback(projectEditorFeedback, "Descrição atualizada.", "success");
         } catch (error) {
-          setFeedback(projectsFeedback, error.message, "error");
+          setFeedback(projectEditorFeedback, error.message, "error");
         }
       },
     });
@@ -279,8 +306,9 @@ function createProjectCard(project) {
             body: JSON.stringify({ isCover: true }),
           });
           await loadProjects();
+          setFeedback(projectEditorFeedback, "Capa atualizada.", "success");
         } catch (error) {
-          setFeedback(projectsFeedback, error.message, "error");
+          setFeedback(projectEditorFeedback, error.message, "error");
         }
       },
     });
@@ -289,90 +317,93 @@ function createProjectCard(project) {
       className: "danger-button",
       textContent: "Remover",
       onclick: async () => {
+        if (!window.confirm("Remover esta imagem do projeto?")) return;
         try {
           await request(`/api/admin/projects/images/${image.id}`, { method: "DELETE" });
           await loadProjects();
+          setFeedback(projectEditorFeedback, "Imagem removida.", "success");
         } catch (error) {
-          setFeedback(projectsFeedback, error.message, "error");
+          setFeedback(projectEditorFeedback, error.message, "error");
         }
       },
     });
-    const moveUpButton = createElement("button", {
-      type: "button",
-      className: "secondary-button",
-      textContent: "Subir",
-      disabled: image.displayOrder === 0,
-      onclick: async () => {
-        const orderedIds = project.images
-          .slice()
-          .sort((left, right) => left.displayOrder - right.displayOrder)
-          .map((item) => item.id);
-        const index = orderedIds.indexOf(image.id);
-        if (index <= 0) return;
-        [orderedIds[index - 1], orderedIds[index]] = [orderedIds[index], orderedIds[index - 1]];
-        try {
-          await request(`/api/admin/projects/${project.id}/images/order`, {
-            method: "PATCH",
-            headers: { "content-type": "application/json" },
-            body: JSON.stringify({ imageIds: orderedIds }),
-          });
-          await loadProjects();
-        } catch (error) {
-          setFeedback(projectsFeedback, error.message, "error");
-        }
-      },
-    });
-    const moveDownButton = createElement("button", {
-      type: "button",
-      className: "secondary-button",
-      textContent: "Descer",
-      disabled: image.displayOrder === project.images.length - 1,
-      onclick: async () => {
-        const orderedIds = project.images
-          .slice()
-          .sort((left, right) => left.displayOrder - right.displayOrder)
-          .map((item) => item.id);
-        const index = orderedIds.indexOf(image.id);
-        if (index < 0 || index >= orderedIds.length - 1) return;
-        [orderedIds[index], orderedIds[index + 1]] = [orderedIds[index + 1], orderedIds[index]];
-        try {
-          await request(`/api/admin/projects/${project.id}/images/order`, {
-            method: "PATCH",
-            headers: { "content-type": "application/json" },
-            body: JSON.stringify({ imageIds: orderedIds }),
-          });
-          await loadProjects();
-        } catch (error) {
-          setFeedback(projectsFeedback, error.message, "error");
-        }
-      },
-    });
+    const orderedIds = project.images
+      .slice()
+      .sort((left, right) => left.displayOrder - right.displayOrder)
+      .map((item) => item.id);
+    const imageIndex = orderedIds.indexOf(image.id);
+    const moveImage = async (offset) => {
+      const nextIndex = imageIndex + offset;
+      if (nextIndex < 0 || nextIndex >= orderedIds.length) return;
+      [orderedIds[imageIndex], orderedIds[nextIndex]] = [orderedIds[nextIndex], orderedIds[imageIndex]];
+      try {
+        await request(`/api/admin/projects/${project.id}/images/order`, {
+          method: "PATCH",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ imageIds: orderedIds }),
+        });
+        await loadProjects();
+      } catch (error) {
+        setFeedback(projectEditorFeedback, error.message, "error");
+      }
+    };
     imageList.append(
       createElement("article", { className: "image-card" }, [
-        imageElement,
-        createElement("small", {
-          textContent: image.isCover ? "Imagem de capa" : `Ordem ${image.displayOrder + 1}`,
+        createElement("img", {
+          src: `${API_BASE}${image.url}`,
+          alt: image.description || project.title,
         }),
+        createElement("small", { textContent: image.isCover ? "Imagem de capa" : `Ordem ${imageIndex + 1}` }),
         descriptionInput,
         createElement("div", { className: "image-actions" }, [
           saveDescription,
           coverButton,
-          moveUpButton,
-          moveDownButton,
+          createElement("button", { type: "button", className: "secondary-button", textContent: "Subir", disabled: imageIndex === 0, onclick: () => moveImage(-1) }),
+          createElement("button", { type: "button", className: "secondary-button", textContent: "Descer", disabled: imageIndex === orderedIds.length - 1, onclick: () => moveImage(1) }),
           deleteImage,
         ]),
       ]),
     );
   }
 
-  return createElement("article", { className: "project-card" }, [
-    header,
-    description,
-    editForm,
-    actions,
+  return createElement("article", { className: "project-card project-editor-card" }, [
+    createElement("div", { className: "project-header" }, [
+      createElement("div", {}, [
+        createElement("h3", { textContent: project.title }),
+        createElement("p", { className: "project-meta", textContent: `Slug: ${project.slug} · ${project.images.length} imagem(ns)` }),
+      ]),
+      createElement("span", { className: `visibility-badge${project.isVisible ? "" : " hidden-badge"}`, textContent: project.isVisible ? "Visível" : "Oculto" }),
+    ]),
+    createElement("div", { className: "stack-form" }, [
+      createElement("label", { textContent: "Título" }, [titleInput]),
+      createElement("label", { textContent: "Descrição" }, [descriptionInput]),
+      saveProjectButton,
+    ]),
+    createElement("div", { className: "project-actions" }, [visibilityButton, deleteButton]),
     imageUpload,
     imageList,
   ]);
+}
+
+function renderProjectScreen() {
+  const project = projectsCache.find((item) => item.id === selectedProjectId);
+  if (!project) {
+    selectedProjectId = null;
+    projectsBrowserSection.hidden = false;
+    projectEditorSection.hidden = true;
+    projectEditor.replaceChildren();
+    return;
+  }
+
+  projectsBrowserSection.hidden = true;
+  projectEditorSection.hidden = false;
+  projectEditor.replaceChildren(createProjectEditor(project));
+}
+
+function selectProject(projectId) {
+  selectedProjectId = projectId;
+  setFeedback(projectEditorFeedback, "");
+  renderProjectScreen();
 }
 
 function createSiteImageCard(key, image) {
@@ -780,12 +811,15 @@ async function uploadWorkCarouselImages() {
 
   workCarouselUploadInProgress = true;
   const formData = new FormData();
-  for (const file of workCarouselFileInput.files) formData.append("images", file);
+  const files = [...workCarouselFileInput.files];
+  workCarouselSelectedFiles.textContent = files.map((file) => file.name).join(", ");
+  files.forEach((file) => formData.append("images", file));
   workCarouselFileInput.disabled = true;
   setFeedback(workCarouselCustomFeedback, "Enviando imagens...");
   try {
     await request("/api/admin/work-carousel/images", { method: "POST", body: formData });
     workCarouselFileInput.value = "";
+    workCarouselSelectedFiles.textContent = "Nenhum novo arquivo selecionado.";
     await loadWorkCarousel();
     setFeedback(workCarouselCustomFeedback, "Imagens adicionadas automaticamente.", "success");
   } catch (error) {
@@ -847,7 +881,8 @@ async function loadProjects() {
   try {
     const data = await request("/api/admin/projects");
     projectsCache = data.projects;
-    projectsList.replaceChildren(...data.projects.map(createProjectCard));
+    renderProjectsBrowser();
+    renderProjectScreen();
     setFeedback(projectsFeedback, data.projects.length ? "" : "Nenhum projeto cadastrado.");
     await loadWorkCarousel();
   } catch (error) {
@@ -879,6 +914,10 @@ loginForm.addEventListener("submit", async (event) => {
 
 projectForm.addEventListener("submit", async (event) => {
   event.preventDefault();
+  if (event.submitter?.value === "cancel") {
+    projectCreateModal.close();
+    return;
+  }
   setFeedback(projectFeedback, "Criando...");
 
   try {
@@ -888,16 +927,32 @@ projectForm.addEventListener("submit", async (event) => {
       body: JSON.stringify({
         title: document.querySelector("#project-title").value,
         description: document.querySelector("#project-description").value,
+        isVisible: projectVisibleInput.checked,
       }),
     });
     projectForm.reset();
-    setFeedback(projectFeedback, "Projeto criado como oculto.", "success");
+    projectCreateModal.close();
+    setFeedback(projectFeedback, "");
+    setFeedback(projectsFeedback, "Projeto criado.", "success");
     await loadProjects();
   } catch (error) {
     setFeedback(projectFeedback, error.message, "error");
   }
 });
 
+document
+  .querySelector("#open-project-create-modal")
+  .addEventListener("click", () => {
+    projectForm.reset();
+    setFeedback(projectFeedback, "");
+    projectCreateModal.showModal();
+  });
+document
+  .querySelector("#back-to-projects-button")
+  .addEventListener("click", () => {
+    selectedProjectId = null;
+    renderProjectScreen();
+  });
 document.querySelector("#refresh-button").addEventListener("click", loadProjects);
 document
   .querySelector("#refresh-site-images-button")

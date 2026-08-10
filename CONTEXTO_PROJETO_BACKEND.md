@@ -335,6 +335,35 @@ continuam armazenadas quando o modo `PROJECT` é escolhido.
 - `node --check`, `prisma validate`, `prisma generate`, build do frontend e
   `npm audit --audit-level=high` aprovados.
 
+## Atualizacao — reorganizacao do painel de projetos
+
+Data: 10/08/2026
+
+O painel administrativo passou a iniciar pela lista de projetos em cards, com
+capa, nome e status. A edicao detalhada de titulo, descricao, visibilidade e
+imagens ocorre somente depois que um projeto e selecionado, mantendo um projeto
+por vez na tela.
+
+A criacao foi removida da visao principal e passou a utilizar o modal `Criar
+novo projeto`. O modal mantem titulo e descricao e adiciona a opcao de criar o
+projeto inicialmente publicado/visivel ou oculto. O backend ja existente para
+`isVisible` foi reutilizado; nao houve alteracao de schema ou migration nesta
+etapa.
+
+O upload de imagens do projeto agora inicia automaticamente no evento de
+selecao, sem o botao adicional `Adicionar imagens`. O seletor usa o mesmo
+padrao visual de `Imagens gerais do site`, com label estilizado, input oculto e
+nome dos arquivos selecionados.
+
+### Validacoes desta etapa
+
+- `node --check frontend/src/admin.js`: aprovado;
+- build do frontend com `admin.html`: aprovado;
+- estrutura do modal de criacao e da lista de projetos verificada no DOM;
+- editor de projeto inicia oculto e e aberto somente apos selecionar um card;
+- seletores de arquivo utilizam a classe visual compartilhada;
+- nenhuma alteracao de backend, Prisma ou migration foi necessaria.
+
 ## Estado de Git
 
 As alterações desta etapa estão no working tree da branch de desenvolvimento atual. Nenhum commit, push ou pull foi executado automaticamente. O próximo commit deve incluir o schema, a migration, o código da API, os ajustes de dependências e este arquivo de contexto.
