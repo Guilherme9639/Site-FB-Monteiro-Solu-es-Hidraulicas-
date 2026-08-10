@@ -5,9 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content="Painel administrativo local da FB Monteiro." />
     <title>Painel administrativo | FB Monteiro</title>
-    <script type="module" crossorigin src="/assets/admin-BOttJVqS.js"></script>
+    <script type="module" crossorigin src="/assets/admin-CuoYAYeN.js"></script>
     <link rel="modulepreload" crossorigin href="/assets/modulepreload-polyfill-B5Qt9EMX.js">
-    <link rel="stylesheet" crossorigin href="/assets/admin-DdiRbO_e.css">
+    <link rel="stylesheet" crossorigin href="/assets/admin-7mqDY34K.css">
   </head>
 
   <body>
@@ -53,6 +53,9 @@
             </div>
           </div>
           <div id="projects-list" class="projects-list"></div>
+          <div id="all-projects-action" class="all-projects-action" hidden>
+            <button id="open-all-projects-modal" class="secondary-button" type="button">Ver todos os projetos</button>
+          </div>
           <p id="projects-feedback" class="feedback" aria-live="polite"></p>
         </section>
 
@@ -62,7 +65,10 @@
               <p class="eyebrow">Projeto selecionado</p>
               <h2>Editar projeto</h2>
             </div>
+          </div>
+          <div class="project-editor-toolbar">
             <button id="back-to-projects-button" class="secondary-button" type="button">Voltar aos projetos</button>
+            <div id="project-editor-actions" class="project-actions"></div>
           </div>
           <div id="project-editor"></div>
           <p id="project-editor-feedback" class="feedback" aria-live="polite"></p>
@@ -150,6 +156,22 @@
         <div class="modal-actions">
           <button class="secondary-button" value="cancel" type="submit">Cancelar</button>
           <button type="submit">Criar projeto</button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog id="all-projects-modal" class="project-selector-modal all-projects-modal" aria-labelledby="all-projects-title">
+      <form method="dialog" class="project-selector-content">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Projetos cadastrados</p>
+            <h2 id="all-projects-title">Todos os projetos</h2>
+          </div>
+          <button class="secondary-button modal-close-button" value="cancel" type="submit" aria-label="Fechar">×</button>
+        </div>
+        <div id="all-projects-list" class="projects-list all-projects-list"></div>
+        <div class="modal-actions">
+          <button class="secondary-button" value="cancel" type="submit">Fechar</button>
         </div>
       </form>
     </dialog>

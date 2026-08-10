@@ -163,6 +163,12 @@ textarea {
   gap: 1rem;
 }
 
+.all-projects-action {
+  display: flex;
+  justify-content: center;
+  margin-top: 1.25rem;
+}
+
 .project-summary-card {
   display: grid;
   gap: 0.75rem;
@@ -215,6 +221,18 @@ textarea {
 
 .project-editor-section {
   margin-top: 1rem;
+}
+
+.project-editor-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin: 1rem 0;
+}
+
+.project-editor-toolbar .project-actions {
+  justify-content: flex-end;
 }
 
 .project-editor-card {
@@ -596,6 +614,16 @@ textarea {
   width: min(92vw, 620px);
 }
 
+.all-projects-modal {
+  width: min(92vw, 980px);
+}
+
+.all-projects-list {
+  max-height: 62vh;
+  padding: 0.25rem;
+  overflow-y: auto;
+}
+
 .image-actions {
   justify-content: flex-start;
   flex-wrap: wrap;
@@ -633,6 +661,15 @@ textarea {
 
   .site-image-key {
     text-align: left;
+  }
+
+  .project-editor-toolbar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .project-editor-toolbar .project-actions {
+    justify-content: flex-start;
   }
 
   .selected-work-project {

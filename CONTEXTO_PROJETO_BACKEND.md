@@ -364,6 +364,38 @@ nome dos arquivos selecionados.
 - seletores de arquivo utilizam a classe visual compartilhada;
 - nenhuma alteracao de backend, Prisma ou migration foi necessaria.
 
+## Atualizacao — grade resumida e modal de todos os projetos
+
+Data: 10/08/2026
+
+A visão principal de projetos agora deriva uma única lista ordenada por
+`createdAt DESC` e exibe somente os cinco projetos mais recentes. A mesma lista
+ordenada alimenta o modal `Todos os projetos`, evitando regras diferentes entre
+as duas visões.
+
+Quando existem mais de cinco projetos, o botão `Ver todos os projetos` aparece
+centralizado abaixo da grade. O modal possui título, fechamento, grade
+responsiva e rolagem interna. Seus cards reutilizam capa/placeholder, nome e
+status; não exibem descrição. Ao selecionar um card, o modal fecha e o fluxo
+existente de `selectedProjectId` abre o editor correspondente. Cancelar não
+altera a seleção atual.
+
+Na edição, `Salvar`, `Publicar/Ocultar` e `Excluir` foram movidos para a barra
+superior, na ordem obrigatória. O botão de visibilidade continua refletindo o
+estado atual do projeto. As versões antigas dessas ações foram removidas do
+conteúdo interno. Em telas menores, a barra pode quebrar sem criar overflow.
+
+### Validacoes desta etapa
+
+- `createdAt` confirmado na resposta administrativa e ordenação existente do
+  backend preservada;
+- build do frontend aprovado;
+- `node --check frontend/src/admin.js` aprovado;
+- modal `Todos os projetos`, botão condicional e barra de ações confirmados no
+  DOM;
+- rolagem interna do modal e editor inicialmente oculto confirmados;
+- nenhuma alteracao de backend, schema, migration, upload ou carrossel feita.
+
 ## Estado de Git
 
 As alterações desta etapa estão no working tree da branch de desenvolvimento atual. Nenhum commit, push ou pull foi executado automaticamente. O próximo commit deve incluir o schema, a migration, o código da API, os ajustes de dependências e este arquivo de contexto.

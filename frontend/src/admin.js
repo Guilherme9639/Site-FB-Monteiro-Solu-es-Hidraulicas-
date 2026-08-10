@@ -12,9 +12,13 @@ const projectVisibleInput = document.querySelector("#project-visible");
 const projectCreateModal = document.querySelector("#project-create-modal");
 const projectEditorSection = document.querySelector("#project-editor-section");
 const projectEditor = document.querySelector("#project-editor");
+const projectEditorActions = document.querySelector("#project-editor-actions");
 const projectEditorFeedback = document.querySelector("#project-editor-feedback");
 const projectsFeedback = document.querySelector("#projects-feedback");
 const projectsList = document.querySelector("#projects-list");
+const allProjectsAction = document.querySelector("#all-projects-action");
+const allProjectsModal = document.querySelector("#all-projects-modal");
+const allProjectsList = document.querySelector("#all-projects-list");
 const siteImagesList = document.querySelector("#site-images-list");
 const siteImagesFeedback = document.querySelector("#site-images-feedback");
 const workCarouselCustomView = document.querySelector("#work-carousel-custom-view");
@@ -119,12 +123,12 @@ function formatDate(value) {
   }).format(date);
 }
 
-function createProjectSummaryCard(project) {
+function createProjectSummaryCard(project, onSelect = selectProject) {
   const cover = getProjectCover(project);
   const card = createElement("button", {
     type: "button",
     className: "project-summary-card",
-    onclick: () => selectProject(project.id),
+    onclick: () => onSelect(project.id),
   });
   card.setAttribute("aria-label", `Editar projeto ${project.title}`);
   card.append(
@@ -146,7 +150,16 @@ function createProjectSummaryCard(project) {
 }
 
 function renderProjectsBrowser() {
-  projectsList.replaceChildren(...projectsCache.map(createProjectSummaryCard));
+  const allSortedProjects = projectsCache
+    .slice()
+    .sort((left, right) => new Date(right.createdAt).getTime() - new Date(left.createdAt).getTime());
+  const latestProjects = allSortedProjects.slice(0, 5);
+
+  projectsList.replaceChildren(...latestProjects.map((project) => createProjectSummaryCard(project)));
+  allProjectsList.replaceChildren(
+    ...allSortedProjects.map((project) => createProjectSummaryCard(project)),
+  );
+  allProjectsAction.hidden = allSortedProjects.length <= 5;
 }
 
 function createProjectEditor(project) {
@@ -161,11 +174,15 @@ function createProjectEditor(project) {
     value: project.description || "",
     maxLength: 5000,
   });
+  let saveInProgress = false;
   const saveProjectButton = createElement("button", {
     type: "button",
     className: "secondary-button",
     textContent: "Salvar alterações",
     onclick: async () => {
+      if (saveInProgress) return;
+      saveInProgress = true;
+      saveProjectButton.disabled = true;
       try {
         await request(`/api/admin/projects/${project.id}`, {
           method: "PATCH",
@@ -176,6 +193,9 @@ function createProjectEditor(project) {
         setFeedback(projectEditorFeedback, "Projeto atualizado.", "success");
       } catch (error) {
         setFeedback(projectEditorFeedback, error.message, "error");
+      } finally {
+        saveProjectButton.disabled = false;
+        saveInProgress = false;
       }
     },
   });
@@ -366,23 +386,24 @@ function createProjectEditor(project) {
     );
   }
 
-  return createElement("article", { className: "project-card project-editor-card" }, [
-    createElement("div", { className: "project-header" }, [
-      createElement("div", {}, [
-        createElement("h3", { textContent: project.title }),
-        createElement("p", { className: "project-meta", textContent: `Slug: ${project.slug} · ${project.images.length} imagem(ns)` }),
+  return {
+    content: createElement("article", { className: "project-card project-editor-card" }, [
+      createElement("div", { className: "project-header" }, [
+        createElement("div", {}, [
+          createElement("h3", { textContent: project.title }),
+          createElement("p", { className: "project-meta", textContent: `Slug: ${project.slug} · ${project.images.length} imagem(ns)` }),
+        ]),
+        createElement("span", { className: `visibility-badge${project.isVisible ? "" : " hidden-badge"}`, textContent: project.isVisible ? "Visível" : "Oculto" }),
       ]),
-      createElement("span", { className: `visibility-badge${project.isVisible ? "" : " hidden-badge"}`, textContent: project.isVisible ? "Visível" : "Oculto" }),
+      createElement("div", { className: "stack-form" }, [
+        createElement("label", { textContent: "Título" }, [titleInput]),
+        createElement("label", { textContent: "Descrição" }, [descriptionInput]),
+      ]),
+      imageUpload,
+      imageList,
     ]),
-    createElement("div", { className: "stack-form" }, [
-      createElement("label", { textContent: "Título" }, [titleInput]),
-      createElement("label", { textContent: "Descrição" }, [descriptionInput]),
-      saveProjectButton,
-    ]),
-    createElement("div", { className: "project-actions" }, [visibilityButton, deleteButton]),
-    imageUpload,
-    imageList,
-  ]);
+    actions: [saveProjectButton, visibilityButton, deleteButton],
+  };
 }
 
 function renderProjectScreen() {
@@ -391,17 +412,21 @@ function renderProjectScreen() {
     selectedProjectId = null;
     projectsBrowserSection.hidden = false;
     projectEditorSection.hidden = true;
+    projectEditorActions.replaceChildren();
     projectEditor.replaceChildren();
     return;
   }
 
   projectsBrowserSection.hidden = true;
   projectEditorSection.hidden = false;
-  projectEditor.replaceChildren(createProjectEditor(project));
+  const editor = createProjectEditor(project);
+  projectEditorActions.replaceChildren(...editor.actions);
+  projectEditor.replaceChildren(editor.content);
 }
 
 function selectProject(projectId) {
   selectedProjectId = projectId;
+  if (allProjectsModal.open) allProjectsModal.close();
   setFeedback(projectEditorFeedback, "");
   renderProjectScreen();
 }
@@ -946,6 +971,11 @@ document
     projectForm.reset();
     setFeedback(projectFeedback, "");
     projectCreateModal.showModal();
+  });
+document
+  .querySelector("#open-all-projects-modal")
+  .addEventListener("click", () => {
+    allProjectsModal.showModal();
   });
 document
   .querySelector("#back-to-projects-button")
