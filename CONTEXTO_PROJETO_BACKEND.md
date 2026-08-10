@@ -300,6 +300,41 @@ a configuracao.
 - `node --check` dos arquivos JavaScript alterados: aprovado;
 - build do frontend com `index.html`, `sobre.html` e `admin.html`: aprovado.
 
+### Refinamentos posteriores
+
+- o upload do modo `CUSTOM` agora começa automaticamente no evento de seleção
+  de arquivos, sem botão adicional;
+- os controles exibidos no painel acompanham imediatamente o modo selecionado,
+  mantendo apenas o bloco `CUSTOM` ou `PROJECT` visível;
+- a regra CSS dos blocos do carrossel foi corrigida para respeitar o atributo
+  `hidden`; a regra de layout anterior podia sobrescrever a ocultação nativa e
+  manter os dois blocos visíveis;
+- foram corrigidas strings com mojibake em português brasileiro no painel e nas
+  mensagens da API. Os documentos HTML já utilizavam `<meta charset="UTF-8">`;
+- a causa das imagens quebradas no modo `PROJECT` era o uso incorreto do
+  endpoint `/api/media/work-carousel/:id` para registros que pertencem a
+  `ProjectImage`. O endpoint público agora retorna `/api/media/projects/:id`
+  para imagens de projetos e mantém `/api/media/work-carousel/:id` para imagens
+  personalizadas;
+- a validação de visibilidade continua sendo feita no backend e o frontend não
+  recebe caminhos físicos nem `storageKey`.
+
+Esses ajustes preservam a alternância entre os modos e as imagens personalizadas
+continuam armazenadas quando o modo `PROJECT` é escolhido.
+
+### Validações do refinamento
+
+- fluxo HTTP do modo `PROJECT` testado com projeto publicado e imagens reais;
+- URLs retornadas verificadas como `/api/media/projects/:id`;
+- primeira imagem do projeto respondendo HTTP 200;
+- estado do carrossel restaurado para `CUSTOM` após o teste;
+- estrutura do painel verificada no navegador: seletor de arquivos presente,
+  botão redundante de upload ausente e `charset` definido como `UTF-8`;
+- regra visual verificada no DOM: os dois blocos iniciam com `hidden` e o
+  estilo computado é `display: none` enquanto inativos;
+- `node --check`, `prisma validate`, `prisma generate`, build do frontend e
+  `npm audit --audit-level=high` aprovados.
+
 ## Estado de Git
 
 As alterações desta etapa estão no working tree da branch de desenvolvimento atual. Nenhum commit, push ou pull foi executado automaticamente. O próximo commit deve incluir o schema, a migration, o código da API, os ajustes de dependências e este arquivo de contexto.

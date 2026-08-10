@@ -24,7 +24,7 @@ Criar uma presença online clara e confiável para a empresa, permitindo que vis
 
 ## Funcionalidades
 
-- Carrossel da obra publicada mais recente na página inicial.
+- Carrossel configurável de obras na página inicial, com modo personalizado ou por projeto publicado.
 - Troca automática de fotos a cada 5 segundos, com navegação manual.
 - Página Sobre com trajetória profissional e especialidade em kits hidráulicos.
 - Cadastro, edição, ordenação, capa, visibilidade e upload de imagens pelo painel.

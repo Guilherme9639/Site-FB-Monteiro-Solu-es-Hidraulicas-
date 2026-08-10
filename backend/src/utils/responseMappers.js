@@ -60,9 +60,10 @@ export function mapSiteImage(image, options = {}) {
 }
 
 export function mapWorkCarouselImage(image, options = {}) {
+  const mediaType = options.mediaType ?? "work-carousel";
   const result = {
     id: image.id,
-    url: imageUrl(image, "work-carousel"),
+    url: imageUrl(image, mediaType),
     description: image.description,
     displayOrder: image.displayOrder,
     isVisible: image.isVisible,

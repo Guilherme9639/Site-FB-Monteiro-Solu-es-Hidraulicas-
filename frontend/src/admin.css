@@ -392,6 +392,10 @@ textarea {
   margin-top: 1rem;
 }
 
+.work-carousel-view[hidden] {
+  display: none !important;
+}
+
 .work-carousel-empty,
 .work-carousel-placeholder {
   display: grid;

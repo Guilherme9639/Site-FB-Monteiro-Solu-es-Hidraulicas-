@@ -51,7 +51,7 @@ function normalizeDescription(description) {
 
   const normalized = String(description).trim();
   if (normalized.length > 2000) {
-    throw httpError(400, "A descriÃ§Ã£o da imagem deve ter no mÃ¡ximo 2000 caracteres.");
+    throw httpError(400, "A descrição da imagem deve ter no máximo 2000 caracteres.");
   }
   return normalized || null;
 }
@@ -95,7 +95,7 @@ export async function updateAdminWorkCarousel(request, response, next) {
       });
 
       if (!project) {
-        throw httpError(400, "O projeto selecionado nÃ£o estÃ¡ publicado ou nÃ£o existe.");
+        throw httpError(400, "O projeto selecionado não está publicado ou não existe.");
       }
     }
 
@@ -127,7 +127,7 @@ export async function addWorkCarouselImages(request, response, next) {
     if (currentCount + files.length > MAX_IMAGES_PER_WORK_CAROUSEL) {
       throw httpError(
         400,
-        `O carrossel pode ter no mÃ¡ximo ${MAX_IMAGES_PER_WORK_CAROUSEL} imagens.`,
+        `O carrossel pode ter no máximo ${MAX_IMAGES_PER_WORK_CAROUSEL} imagens.`,
       );
     }
 
@@ -179,7 +179,7 @@ export async function updateWorkCarouselImage(request, response, next) {
     });
 
     if (!image) {
-      return response.status(404).json({ message: "Imagem nÃ£o encontrada." });
+      return response.status(404).json({ message: "Imagem não encontrada." });
     }
 
     const data = {};
@@ -194,7 +194,7 @@ export async function updateWorkCarouselImage(request, response, next) {
     }
 
     if (Object.keys(data).length === 0) {
-      throw httpError(400, "Nenhum campo vÃ¡lido foi enviado para atualizaÃ§Ã£o.");
+      throw httpError(400, "Nenhum campo válido foi enviado para atualização.");
     }
 
     const updated = await prisma.workCarouselImage.update({
@@ -217,7 +217,7 @@ export async function deleteWorkCarouselImage(request, response, next) {
     });
 
     if (!image) {
-      return response.status(404).json({ message: "Imagem nÃ£o encontrada." });
+      return response.status(404).json({ message: "Imagem não encontrada." });
     }
 
     await remove(image.storageKey);
@@ -237,7 +237,7 @@ export async function reorderWorkCarouselImages(request, response, next) {
       imageIds.length === 0 ||
       new Set(imageIds).size !== imageIds.length
     ) {
-      throw httpError(400, "Envie uma lista Ãºnica de imageIds.");
+      throw httpError(400, "Envie uma lista única de imageIds.");
     }
 
     const config = await getOrCreateConfig();
@@ -251,7 +251,7 @@ export async function reorderWorkCarouselImages(request, response, next) {
       storedIds.size !== imageIds.length ||
       imageIds.some((imageId) => !storedIds.has(imageId))
     ) {
-      throw httpError(400, "A ordenaÃ§Ã£o deve conter exatamente as imagens do carrossel.");
+      throw httpError(400, "A ordenação deve conter exatamente as imagens do carrossel.");
     }
 
     await prisma.$transaction(
@@ -307,7 +307,11 @@ export async function getPublicWorkCarousel(request, response, next) {
     return response.status(200).json({
       mode: config.mode,
       project: mapWorkCarouselProject(publicProject),
-      images: images.map((image) => mapWorkCarouselImage(image)),
+      images: images.map((image) =>
+        mapWorkCarouselImage(image, {
+          mediaType: config.mode === "PROJECT" ? "projects" : "work-carousel",
+        }),
+      ),
     });
   } catch (error) {
     return next(error);
@@ -323,7 +327,7 @@ export async function serveWorkCarouselImage(request, response, next) {
 
     const isPubliclyAvailable = image?.config.mode === "CUSTOM" && image.isVisible;
     if (!image || (!request.user && !isPubliclyAvailable)) {
-      return response.status(404).json({ message: "Imagem nÃ£o encontrada." });
+      return response.status(404).json({ message: "Imagem não encontrada." });
     }
 
     return response.sendFile(getPath(image.storageKey));

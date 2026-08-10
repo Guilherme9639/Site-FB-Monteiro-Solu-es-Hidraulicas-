@@ -15,7 +15,6 @@ const workCarouselCustomView = document.querySelector("#work-carousel-custom-vie
 const workCarouselProjectView = document.querySelector("#work-carousel-project-view");
 const workCarouselImagesList = document.querySelector("#work-carousel-images-list");
 const workCarouselFileInput = document.querySelector("#work-carousel-file-input");
-const workCarouselUploadButton = document.querySelector("#work-carousel-upload-button");
 const workCarouselCustomFeedback = document.querySelector("#work-carousel-custom-feedback");
 const workCarouselSelectedProject = document.querySelector("#work-carousel-selected-project");
 const workCarouselProjectFeedback = document.querySelector("#work-carousel-project-feedback");
@@ -28,6 +27,7 @@ const projectSelectorSaveButton = document.querySelector("#save-project-selectio
 let projectsCache = [];
 let workCarouselConfig = null;
 let selectedProjectDraftId = null;
+let workCarouselUploadInProgress = false;
 const SITE_IMAGE_SECTIONS = {
   "home.hero": {
     title: "Banner principal da página inicial",
@@ -573,14 +573,14 @@ function createWorkCarouselImageCard(image, index, images) {
   const descriptionInput = createElement("input", {
     type: "text",
     value: image.description || "",
-    placeholder: "DescriÃ§Ã£o acessÃ­vel da imagem",
+    placeholder: "Descrição acessível da imagem",
     maxLength: 2000,
   });
   const feedback = createElement("p", { className: "feedback" });
   const saveDescription = createElement("button", {
     type: "button",
     className: "secondary-button",
-    textContent: "Salvar descriÃ§Ã£o",
+    textContent: "Salvar descrição",
     onclick: async () => {
       try {
         await request(`/api/admin/work-carousel/images/${image.id}`, {
@@ -678,8 +678,8 @@ function renderSelectedWorkCarouselProject(project) {
       createElement("h3", { textContent: project.title }),
       createElement("p", {
         textContent: project.isVisible
-          ? `${project.imageCount} imagem(ns) serÃ£o utilizadas.`
-          : "Este projeto estÃ¡ oculto e nÃ£o aparece no carrossel pÃºblico.",
+          ? `${project.imageCount} imagem(ns) serão utilizadas.`
+          : "Este projeto está oculto e não aparece no carrossel público.",
       }),
     ]),
   );
@@ -712,16 +712,20 @@ function renderProjectSelector() {
   );
   setFeedback(
     projectSelectorFeedback,
-    visibleProjects.length ? "" : "Nenhum projeto publicado disponÃ­vel.",
+    visibleProjects.length ? "" : "Nenhum projeto publicado disponível.",
     visibleProjects.length ? "" : "error",
   );
+}
+
+function toggleWorkCarouselViews(mode) {
+  workCarouselCustomView.hidden = mode !== "CUSTOM";
+  workCarouselProjectView.hidden = mode !== "PROJECT";
 }
 
 function renderWorkCarousel(config) {
   workCarouselConfig = config;
   document.querySelector(`#work-mode-${config.mode.toLowerCase()}`).checked = true;
-  workCarouselCustomView.hidden = config.mode !== "CUSTOM";
-  workCarouselProjectView.hidden = config.mode !== "PROJECT";
+  toggleWorkCarouselViews(config.mode);
   workCarouselImagesList.replaceChildren(
     ...config.images.map((image, index) => createWorkCarouselImageCard(image, index, config.images)),
   );
@@ -770,24 +774,31 @@ async function saveWorkCarouselMode() {
 }
 
 async function uploadWorkCarouselImages() {
-  if (!workCarouselFileInput.files.length) {
-    setFeedback(workCarouselCustomFeedback, "Escolha pelo menos uma imagem.", "error");
+  if (workCarouselUploadInProgress || !workCarouselFileInput.files.length) {
     return;
   }
+
+  workCarouselUploadInProgress = true;
   const formData = new FormData();
   for (const file of workCarouselFileInput.files) formData.append("images", file);
-  workCarouselUploadButton.disabled = true;
-  setFeedback(workCarouselCustomFeedback, "Enviando...");
+  workCarouselFileInput.disabled = true;
+  setFeedback(workCarouselCustomFeedback, "Enviando imagens...");
   try {
     await request("/api/admin/work-carousel/images", { method: "POST", body: formData });
     workCarouselFileInput.value = "";
     await loadWorkCarousel();
-    setFeedback(workCarouselCustomFeedback, "Imagens adicionadas.", "success");
+    setFeedback(workCarouselCustomFeedback, "Imagens adicionadas automaticamente.", "success");
   } catch (error) {
     setFeedback(workCarouselCustomFeedback, error.message, "error");
   } finally {
-    workCarouselUploadButton.disabled = false;
+    workCarouselFileInput.disabled = false;
+    workCarouselUploadInProgress = false;
   }
+}
+
+function handleWorkCarouselModeChange(event) {
+  toggleWorkCarouselViews(event.target.value);
+  setFeedback(workCarouselModeFeedback, "");
 }
 
 function openProjectSelector() {
@@ -897,7 +908,10 @@ document
 document
   .querySelector("#save-work-carousel-mode")
   .addEventListener("click", saveWorkCarouselMode);
-workCarouselUploadButton.addEventListener("click", uploadWorkCarouselImages);
+workCarouselFileInput.addEventListener("change", uploadWorkCarouselImages);
+document.querySelectorAll('input[name="work-carousel-mode"]').forEach((input) => {
+  input.addEventListener("change", handleWorkCarouselModeChange);
+});
 document
   .querySelector("#select-work-carousel-project")
   .addEventListener("click", openProjectSelector);
