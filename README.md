@@ -34,6 +34,11 @@ Criar uma presença online clara e confiável para a empresa, permitindo que vis
 
 ## Desenvolvimento
 
+O carrossel publico da secao “Nosso trabalho” e resolvido pela API
+`GET /api/work-carousel`. O painel permite selecionar imagens personalizadas ou
+um projeto publicado; a pagina Sobre nao usa mais automaticamente o primeiro
+projeto cadastrado.
+
 O projeto utiliza um fluxo de trabalho com branches e pull requests para organizar as entregas e registrar a evolução do site.
 
 ## Como executar localmente

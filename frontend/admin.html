@@ -75,8 +75,66 @@
           <div id="site-images-list" class="site-images-list"></div>
           <p id="site-images-feedback" class="feedback" aria-live="polite"></p>
         </section>
+
+        <section class="panel-card work-carousel-section">
+          <div class="section-heading">
+            <div>
+              <h2>Carrossel “Nosso trabalho”</h2>
+              <p>Escolha imagens próprias ou use as imagens de um projeto publicado.</p>
+            </div>
+            <button id="refresh-work-carousel-button" class="secondary-button" type="button">Atualizar</button>
+          </div>
+
+          <div class="work-carousel-mode" role="radiogroup" aria-label="Modo do carrossel">
+            <label class="mode-option">
+              <input id="work-mode-custom" type="radio" name="work-carousel-mode" value="CUSTOM" />
+              <span>Carrossel personalizado</span>
+            </label>
+            <label class="mode-option">
+              <input id="work-mode-project" type="radio" name="work-carousel-mode" value="PROJECT" />
+              <span>Usar projeto existente</span>
+            </label>
+          </div>
+          <button id="save-work-carousel-mode" type="button">Salvar modo</button>
+          <p id="work-carousel-mode-feedback" class="feedback" aria-live="polite"></p>
+
+          <div id="work-carousel-custom-view" class="work-carousel-view" hidden>
+            <div class="image-upload">
+              <strong>Imagens personalizadas</strong>
+              <input id="work-carousel-file-input" type="file" accept="image/jpeg,image/png" multiple />
+              <button id="work-carousel-upload-button" type="button">Adicionar imagens</button>
+            </div>
+            <div id="work-carousel-images-list" class="image-list"></div>
+            <p id="work-carousel-custom-feedback" class="feedback" aria-live="polite"></p>
+          </div>
+
+          <div id="work-carousel-project-view" class="work-carousel-view" hidden>
+            <div id="work-carousel-selected-project"></div>
+            <button id="select-work-carousel-project" class="secondary-button" type="button">Selecionar projeto</button>
+            <p id="work-carousel-project-feedback" class="feedback" aria-live="polite"></p>
+          </div>
+          <p id="work-carousel-feedback" class="feedback" aria-live="polite"></p>
+        </section>
       </section>
     </main>
+
+    <dialog id="project-selector-modal" class="project-selector-modal" aria-labelledby="project-selector-title">
+      <form method="dialog" class="project-selector-content">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Carrossel “Nosso trabalho”</p>
+            <h2 id="project-selector-title">Selecionar projeto publicado</h2>
+          </div>
+          <button id="close-project-selector" class="secondary-button modal-close-button" value="cancel" type="submit" aria-label="Fechar">×</button>
+        </div>
+        <div id="project-selector-list" class="project-selector-list"></div>
+        <p id="project-selector-feedback" class="feedback" aria-live="polite"></p>
+        <div class="modal-actions">
+          <button class="secondary-button" value="cancel" type="submit">Cancelar</button>
+          <button id="save-project-selection" value="default" type="button">Usar este projeto</button>
+        </div>
+      </form>
+    </dialog>
 
     <script type="module" src="/src/admin.js"></script>
   </body>

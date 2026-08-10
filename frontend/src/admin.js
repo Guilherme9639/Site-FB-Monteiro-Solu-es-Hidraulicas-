@@ -11,6 +11,23 @@ const projectsFeedback = document.querySelector("#projects-feedback");
 const projectsList = document.querySelector("#projects-list");
 const siteImagesList = document.querySelector("#site-images-list");
 const siteImagesFeedback = document.querySelector("#site-images-feedback");
+const workCarouselCustomView = document.querySelector("#work-carousel-custom-view");
+const workCarouselProjectView = document.querySelector("#work-carousel-project-view");
+const workCarouselImagesList = document.querySelector("#work-carousel-images-list");
+const workCarouselFileInput = document.querySelector("#work-carousel-file-input");
+const workCarouselUploadButton = document.querySelector("#work-carousel-upload-button");
+const workCarouselCustomFeedback = document.querySelector("#work-carousel-custom-feedback");
+const workCarouselSelectedProject = document.querySelector("#work-carousel-selected-project");
+const workCarouselProjectFeedback = document.querySelector("#work-carousel-project-feedback");
+const workCarouselModeFeedback = document.querySelector("#work-carousel-mode-feedback");
+const workCarouselFeedback = document.querySelector("#work-carousel-feedback");
+const projectSelectorModal = document.querySelector("#project-selector-modal");
+const projectSelectorList = document.querySelector("#project-selector-list");
+const projectSelectorFeedback = document.querySelector("#project-selector-feedback");
+const projectSelectorSaveButton = document.querySelector("#save-project-selection");
+let projectsCache = [];
+let workCarouselConfig = null;
+let selectedProjectDraftId = null;
 const SITE_IMAGE_SECTIONS = {
   "home.hero": {
     title: "Banner principal da página inicial",
@@ -548,6 +565,258 @@ function createSiteImageCard(key, image) {
   return card;
 }
 
+function getProjectCover(project) {
+  return project?.images?.find((image) => image.isCover) || project?.images?.[0] || null;
+}
+
+function createWorkCarouselImageCard(image, index, images) {
+  const descriptionInput = createElement("input", {
+    type: "text",
+    value: image.description || "",
+    placeholder: "DescriÃ§Ã£o acessÃ­vel da imagem",
+    maxLength: 2000,
+  });
+  const feedback = createElement("p", { className: "feedback" });
+  const saveDescription = createElement("button", {
+    type: "button",
+    className: "secondary-button",
+    textContent: "Salvar descriÃ§Ã£o",
+    onclick: async () => {
+      try {
+        await request(`/api/admin/work-carousel/images/${image.id}`, {
+          method: "PATCH",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ description: descriptionInput.value }),
+        });
+        await loadWorkCarousel();
+      } catch (error) {
+        setFeedback(feedback, error.message, "error");
+      }
+    },
+  });
+  const removeButton = createElement("button", {
+    type: "button",
+    className: "danger-button",
+    textContent: "Remover",
+    onclick: async () => {
+      if (!window.confirm("Remover esta imagem do carrossel?")) return;
+      try {
+        await request(`/api/admin/work-carousel/images/${image.id}`, { method: "DELETE" });
+        await loadWorkCarousel();
+      } catch (error) {
+        setFeedback(feedback, error.message, "error");
+      }
+    },
+  });
+  const move = async (offset) => {
+    const nextIndex = index + offset;
+    if (nextIndex < 0 || nextIndex >= images.length) return;
+    const imageIds = images.map((item) => item.id);
+    [imageIds[index], imageIds[nextIndex]] = [imageIds[nextIndex], imageIds[index]];
+    try {
+      await request("/api/admin/work-carousel/images/order", {
+        method: "PATCH",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ imageIds }),
+      });
+      await loadWorkCarousel();
+    } catch (error) {
+      setFeedback(feedback, error.message, "error");
+    }
+  };
+  const imageActions = createElement("div", { className: "image-actions" }, [
+    saveDescription,
+    createElement("button", {
+      type: "button",
+      className: "secondary-button",
+      textContent: "Subir",
+      disabled: index === 0,
+      onclick: () => move(-1),
+    }),
+    createElement("button", {
+      type: "button",
+      className: "secondary-button",
+      textContent: "Descer",
+      disabled: index === images.length - 1,
+      onclick: () => move(1),
+    }),
+    removeButton,
+  ]);
+  return createElement("article", { className: "image-card" }, [
+    createElement("img", {
+      src: `${API_BASE}${image.url}`,
+      alt: image.description || "Imagem do carrossel Nosso trabalho",
+    }),
+    createElement("small", { textContent: `Ordem ${index + 1}` }),
+    descriptionInput,
+    imageActions,
+    feedback,
+  ]);
+}
+
+function renderSelectedWorkCarouselProject(project) {
+  workCarouselSelectedProject.replaceChildren();
+  if (!project) {
+    workCarouselSelectedProject.append(
+      createElement("div", { className: "work-carousel-empty", textContent: "Nenhum projeto selecionado." }),
+    );
+    return;
+  }
+
+  const cover = project.coverImage;
+  const card = createElement("article", { className: "selected-work-project" });
+  if (cover) {
+    card.append(createElement("img", {
+      src: `${API_BASE}${cover.url}`,
+      alt: cover.description || project.title,
+    }));
+  } else {
+    card.append(createElement("div", { className: "work-carousel-placeholder", textContent: "Sem capa" }));
+  }
+  card.append(
+    createElement("div", {}, [
+      createElement("h3", { textContent: project.title }),
+      createElement("p", {
+        textContent: project.isVisible
+          ? `${project.imageCount} imagem(ns) serÃ£o utilizadas.`
+          : "Este projeto estÃ¡ oculto e nÃ£o aparece no carrossel pÃºblico.",
+      }),
+    ]),
+  );
+  workCarouselSelectedProject.append(card);
+}
+
+function renderProjectSelector() {
+  const visibleProjects = projectsCache.filter((project) => project.isVisible);
+  projectSelectorList.replaceChildren(
+    ...visibleProjects.map((project) => {
+      const cover = getProjectCover(project);
+      const card = createElement("button", {
+        type: "button",
+        className: `project-picker-card${selectedProjectDraftId === project.id ? " is-selected" : ""}`,
+        onclick: () => {
+          selectedProjectDraftId = project.id;
+          renderProjectSelector();
+        },
+      });
+      card.setAttribute("aria-pressed", String(selectedProjectDraftId === project.id));
+      card.append(
+        cover
+          ? createElement("img", { src: `${API_BASE}${cover.url}`, alt: cover.description || project.title })
+          : createElement("div", { className: "work-carousel-placeholder", textContent: "Sem capa" }),
+        createElement("strong", { textContent: project.title }),
+        createElement("small", { textContent: `${project.images.length} imagem(ns)` }),
+      );
+      return card;
+    }),
+  );
+  setFeedback(
+    projectSelectorFeedback,
+    visibleProjects.length ? "" : "Nenhum projeto publicado disponÃ­vel.",
+    visibleProjects.length ? "" : "error",
+  );
+}
+
+function renderWorkCarousel(config) {
+  workCarouselConfig = config;
+  document.querySelector(`#work-mode-${config.mode.toLowerCase()}`).checked = true;
+  workCarouselCustomView.hidden = config.mode !== "CUSTOM";
+  workCarouselProjectView.hidden = config.mode !== "PROJECT";
+  workCarouselImagesList.replaceChildren(
+    ...config.images.map((image, index) => createWorkCarouselImageCard(image, index, config.images)),
+  );
+  if (!config.images.length) {
+    workCarouselImagesList.append(
+      createElement("p", { className: "work-carousel-empty", textContent: "Nenhuma imagem personalizada cadastrada." }),
+    );
+  }
+  renderSelectedWorkCarouselProject(config.selectedProject);
+  setFeedback(workCarouselFeedback, "");
+}
+
+async function loadWorkCarousel() {
+  setFeedback(workCarouselFeedback, "Carregando...");
+  try {
+    const data = await request("/api/admin/work-carousel");
+    renderWorkCarousel(data.config);
+  } catch (error) {
+    setFeedback(workCarouselFeedback, error.message, "error");
+  }
+}
+
+async function saveWorkCarouselMode() {
+  const mode = document.querySelector('input[name="work-carousel-mode"]:checked')?.value;
+  const body = { mode };
+  if (mode === "PROJECT") {
+    if (!workCarouselConfig?.selectedProject?.id) {
+      setFeedback(workCarouselModeFeedback, "Selecione um projeto antes de salvar este modo.", "error");
+      return;
+    }
+    body.selectedProjectId = workCarouselConfig.selectedProject.id;
+  }
+
+  setFeedback(workCarouselModeFeedback, "Salvando...");
+  try {
+    const data = await request("/api/admin/work-carousel", {
+      method: "PATCH",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify(body),
+    });
+    renderWorkCarousel(data.config);
+    setFeedback(workCarouselModeFeedback, "Modo salvo.", "success");
+  } catch (error) {
+    setFeedback(workCarouselModeFeedback, error.message, "error");
+  }
+}
+
+async function uploadWorkCarouselImages() {
+  if (!workCarouselFileInput.files.length) {
+    setFeedback(workCarouselCustomFeedback, "Escolha pelo menos uma imagem.", "error");
+    return;
+  }
+  const formData = new FormData();
+  for (const file of workCarouselFileInput.files) formData.append("images", file);
+  workCarouselUploadButton.disabled = true;
+  setFeedback(workCarouselCustomFeedback, "Enviando...");
+  try {
+    await request("/api/admin/work-carousel/images", { method: "POST", body: formData });
+    workCarouselFileInput.value = "";
+    await loadWorkCarousel();
+    setFeedback(workCarouselCustomFeedback, "Imagens adicionadas.", "success");
+  } catch (error) {
+    setFeedback(workCarouselCustomFeedback, error.message, "error");
+  } finally {
+    workCarouselUploadButton.disabled = false;
+  }
+}
+
+function openProjectSelector() {
+  selectedProjectDraftId = workCarouselConfig?.selectedProject?.id || null;
+  renderProjectSelector();
+  projectSelectorModal.showModal();
+}
+
+async function saveProjectSelection() {
+  if (!selectedProjectDraftId) {
+    setFeedback(projectSelectorFeedback, "Selecione um projeto publicado.", "error");
+    return;
+  }
+  projectSelectorSaveButton.disabled = true;
+  try {
+    const data = await request("/api/admin/work-carousel", {
+      method: "PATCH",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ mode: "PROJECT", selectedProjectId: selectedProjectDraftId }),
+    });
+    renderWorkCarousel(data.config);
+    projectSelectorModal.close();
+  } catch (error) {
+    setFeedback(projectSelectorFeedback, error.message, "error");
+  } finally {
+    projectSelectorSaveButton.disabled = false;
+  }
+}
+
 async function loadSiteImages() {
   setFeedback(siteImagesFeedback, "Carregando...");
   try {
@@ -566,8 +835,10 @@ async function loadProjects() {
   setFeedback(projectsFeedback, "Carregando...");
   try {
     const data = await request("/api/admin/projects");
+    projectsCache = data.projects;
     projectsList.replaceChildren(...data.projects.map(createProjectCard));
     setFeedback(projectsFeedback, data.projects.length ? "" : "Nenhum projeto cadastrado.");
+    await loadWorkCarousel();
   } catch (error) {
     setFeedback(projectsFeedback, error.message, "error");
   }
@@ -620,6 +891,17 @@ document.querySelector("#refresh-button").addEventListener("click", loadProjects
 document
   .querySelector("#refresh-site-images-button")
   .addEventListener("click", loadSiteImages);
+document
+  .querySelector("#refresh-work-carousel-button")
+  .addEventListener("click", loadWorkCarousel);
+document
+  .querySelector("#save-work-carousel-mode")
+  .addEventListener("click", saveWorkCarouselMode);
+workCarouselUploadButton.addEventListener("click", uploadWorkCarouselImages);
+document
+  .querySelector("#select-work-carousel-project")
+  .addEventListener("click", openProjectSelector);
+projectSelectorSaveButton.addEventListener("click", saveProjectSelection);
 
 document.querySelector("#logout-button").addEventListener("click", async () => {
   try {

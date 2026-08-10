@@ -240,6 +240,66 @@ O botão unificado `Salvar alterações` permite adicionar uma imagem, substitui
 
 Os registros artificiais dos testes foram removidos. O banco local mantém o administrador seed e os contatos existentes anteriormente. A administração de contatos continua planejada para uma etapa posterior.
 
+## Atualizacao — carrossel “Nosso trabalho”
+
+Data: 10/08/2026
+
+A secao publica “Nosso trabalho”, que anteriormente utilizava automaticamente
+`projects[0]`, agora possui configuracao propria e nao depende mais da ordem de
+cadastro dos projetos.
+
+### Modelos adicionados
+
+- `WorkCarouselConfig`: configuracao unica do carrossel, com `mode` (`CUSTOM` ou
+  `PROJECT`) e referencia opcional ao projeto selecionado.
+- `WorkCarouselImage`: imagens personalizadas, com descricao, ordem, visibilidade
+  e metadados de armazenamento.
+
+As imagens personalizadas nao sao apagadas ao alternar para o modo por projeto.
+A relacao com `Project` usa `SetNull`; excluir definitivamente o projeto
+selecionado nao deixa referencia quebrada. Projetos ocultos deixam de ser usados
+no endpoint publico e nao podem ser selecionados pelo painel.
+
+### Rotas
+
+```text
+GET    /api/admin/work-carousel
+PATCH  /api/admin/work-carousel
+POST   /api/admin/work-carousel/images
+PATCH  /api/admin/work-carousel/images/:imageId
+DELETE /api/admin/work-carousel/images/:imageId
+PATCH  /api/admin/work-carousel/images/order
+GET    /api/work-carousel
+GET    /api/media/work-carousel/:imageId
+```
+
+As rotas administrativas exigem autenticacao. O limite de imagens personalizadas
+usa `MAX_IMAGES_PER_WORK_CAROUSEL`, com 20 como padrao, e reaproveita as
+validacoes de JPG/PNG, assinatura binaria, tamanho e armazenamento local seguro.
+
+O endpoint publico resolve o modo ativo, retorna apenas imagens visiveis e nao
+expoe `storageKey`, caminhos internos ou dados administrativos. A pagina
+`frontend/sobre.html` consome essa rota preservando o layout e o comportamento do
+carrossel.
+
+### Painel
+
+`frontend/admin.html` ganhou a secao “Carrossel Nosso trabalho”, com modo
+personalizado, upload multiplo, preview, descricao, remocao, ordenacao e modal
+interno para selecionar um unico projeto publicado. Cancelar o modal nao altera
+a configuracao.
+
+### Validacoes desta etapa
+
+- `prisma validate`: aprovado;
+- migration `20260810191234_add_work_carousel`: criada e aplicada;
+- `prisma generate`: aprovado;
+- endpoint publico inicial: `CUSTOM` com lista vazia;
+- rota administrativa sem sessao: `401`;
+- rota administrativa autenticada: configuracao carregada;
+- `node --check` dos arquivos JavaScript alterados: aprovado;
+- build do frontend com `index.html`, `sobre.html` e `admin.html`: aprovado.
+
 ## Estado de Git
 
 As alterações desta etapa estão no working tree da branch de desenvolvimento atual. Nenhum commit, push ou pull foi executado automaticamente. O próximo commit deve incluir o schema, a migration, o código da API, os ajustes de dependências e este arquivo de contexto.
