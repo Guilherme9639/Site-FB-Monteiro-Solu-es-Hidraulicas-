@@ -193,9 +193,13 @@ textarea {
 .project-summary-placeholder {
   width: 100%;
   aspect-ratio: 4 / 3;
-  object-fit: cover;
   background: #e5edf4;
   border-radius: 0.6rem;
+}
+
+.project-summary-card img {
+  object-fit: fill;
+  object-position: center;
 }
 
 .project-summary-placeholder {
@@ -370,9 +374,13 @@ textarea {
   width: 100%;
   min-height: 12rem;
   aspect-ratio: 16 / 9;
-  object-fit: cover;
   background: #e5edf4;
   border-radius: 0.5rem;
+}
+
+.site-image-card img {
+  object-fit: fill;
+  object-position: center;
 }
 
 .site-image-placeholder {
@@ -459,7 +467,8 @@ textarea {
 .image-card img {
   width: 100%;
   aspect-ratio: 4 / 3;
-  object-fit: cover;
+  object-fit: fill;
+  object-position: center;
   background: #e5edf4;
   border-radius: 0.5rem;
 }
@@ -542,8 +551,12 @@ textarea {
 .selected-work-project .work-carousel-placeholder {
   width: 100%;
   aspect-ratio: 16 / 10;
-  object-fit: cover;
   min-height: 0;
+}
+
+.selected-work-project img {
+  object-fit: fill;
+  object-position: center;
 }
 
 .selected-work-project h3 {
@@ -634,8 +647,12 @@ textarea {
   width: 100%;
   aspect-ratio: 16 / 10;
   min-height: 0;
-  object-fit: cover;
   border-radius: 0.5rem;
+}
+
+.project-picker-card img {
+  object-fit: fill;
+  object-position: center;
 }
 
 .project-picker-card small {

@@ -1,8 +1,8 @@
-# Contexto do projeto — Backend e painel administrativo
+# Contexto do projeto — Marcelo
 
-Última atualização: 03/08/2026
+Última atualização: 10/08/2026
 
-Este arquivo registra o contexto técnico da parte de backend do projeto FB Monteiro Soluções Hidráulicas. Ele deve ser atualizado ao final de cada etapa relevante para manter as decisões, riscos e próximos passos documentados.
+Este arquivo registra o contexto técnico das alterações desenvolvidas por Marcelo no projeto FB Monteiro Soluções Hidráulicas, abrangendo backend, frontend e painel administrativo. Ele deve ser atualizado ao final de cada etapa relevante para manter as decisões, riscos e próximos passos documentados.
 
 ## Objetivo da minha parte
 
@@ -240,25 +240,25 @@ O botão unificado `Salvar alterações` permite adicionar uma imagem, substitui
 
 Os registros artificiais dos testes foram removidos. O banco local mantém o administrador seed e os contatos existentes anteriormente. A administração de contatos continua planejada para uma etapa posterior.
 
-## Atualizacao — carrossel “Nosso trabalho”
+## Atualização — carrossel “Nosso trabalho”
 
 Data: 10/08/2026
 
-A secao publica “Nosso trabalho”, que anteriormente utilizava automaticamente
-`projects[0]`, agora possui configuracao propria e nao depende mais da ordem de
+A seção pública “Nosso trabalho”, que anteriormente utilizava automaticamente
+`projects[0]`, agora possui configuração própria e não depende mais da ordem de
 cadastro dos projetos.
 
 ### Modelos adicionados
 
-- `WorkCarouselConfig`: configuracao unica do carrossel, com `mode` (`CUSTOM` ou
-  `PROJECT`) e referencia opcional ao projeto selecionado.
-- `WorkCarouselImage`: imagens personalizadas, com descricao, ordem, visibilidade
+- `WorkCarouselConfig`: configuração única do carrossel, com `mode` (`CUSTOM` ou
+  `PROJECT`) e referência opcional ao projeto selecionado.
+- `WorkCarouselImage`: imagens personalizadas, com descrição, ordem, visibilidade
   e metadados de armazenamento.
 
-As imagens personalizadas nao sao apagadas ao alternar para o modo por projeto.
-A relacao com `Project` usa `SetNull`; excluir definitivamente o projeto
-selecionado nao deixa referencia quebrada. Projetos ocultos deixam de ser usados
-no endpoint publico e nao podem ser selecionados pelo painel.
+As imagens personalizadas não são apagadas ao alternar para o modo por projeto.
+A relação com `Project` usa `SetNull`; excluir definitivamente o projeto
+selecionado não deixa referência quebrada. Projetos ocultos deixam de ser usados
+no endpoint público e não podem ser selecionados pelo painel.
 
 ### Rotas
 
@@ -273,30 +273,30 @@ GET    /api/work-carousel
 GET    /api/media/work-carousel/:imageId
 ```
 
-As rotas administrativas exigem autenticacao. O limite de imagens personalizadas
-usa `MAX_IMAGES_PER_WORK_CAROUSEL`, com 20 como padrao, e reaproveita as
-validacoes de JPG/PNG, assinatura binaria, tamanho e armazenamento local seguro.
+As rotas administrativas exigem autenticação. O limite de imagens personalizadas
+usa `MAX_IMAGES_PER_WORK_CAROUSEL`, com 20 como padrão, e reaproveita as
+validações de JPG/PNG, assinatura binária, tamanho e armazenamento local seguro.
 
-O endpoint publico resolve o modo ativo, retorna apenas imagens visiveis e nao
-expoe `storageKey`, caminhos internos ou dados administrativos. A pagina
+O endpoint público resolve o modo ativo, retorna apenas imagens visíveis e não
+expõe `storageKey`, caminhos internos ou dados administrativos. A página
 `frontend/sobre.html` consome essa rota preservando o layout e o comportamento do
 carrossel.
 
 ### Painel
 
-`frontend/admin.html` ganhou a secao “Carrossel Nosso trabalho”, com modo
-personalizado, upload multiplo, preview, descricao, remocao, ordenacao e modal
-interno para selecionar um unico projeto publicado. Cancelar o modal nao altera
-a configuracao.
+`frontend/admin.html` ganhou a seção “Carrossel Nosso trabalho”, com modo
+personalizado, upload múltiplo, preview, descrição, remoção, ordenação e modal
+interno para selecionar um único projeto publicado. Cancelar o modal não altera
+a configuração.
 
-### Validacoes desta etapa
+### Validações desta etapa
 
 - `prisma validate`: aprovado;
 - migration `20260810191234_add_work_carousel`: criada e aplicada;
 - `prisma generate`: aprovado;
 - endpoint publico inicial: `CUSTOM` com lista vazia;
 - rota administrativa sem sessao: `401`;
-- rota administrativa autenticada: configuracao carregada;
+- rota administrativa autenticada: configuração carregada;
 - `node --check` dos arquivos JavaScript alterados: aprovado;
 - build do frontend com `index.html`, `sobre.html` e `admin.html`: aprovado.
 
@@ -335,36 +335,36 @@ continuam armazenadas quando o modo `PROJECT` é escolhido.
 - `node --check`, `prisma validate`, `prisma generate`, build do frontend e
   `npm audit --audit-level=high` aprovados.
 
-## Atualizacao — reorganizacao do painel de projetos
+## Atualização — reorganização do painel de projetos
 
 Data: 10/08/2026
 
 O painel administrativo passou a iniciar pela lista de projetos em cards, com
-capa, nome e status. A edicao detalhada de titulo, descricao, visibilidade e
-imagens ocorre somente depois que um projeto e selecionado, mantendo um projeto
+capa, nome e status. A edição detalhada de título, descrição, visibilidade e
+imagens ocorre somente depois que um projeto é selecionado, mantendo um projeto
 por vez na tela.
 
-A criacao foi removida da visao principal e passou a utilizar o modal `Criar
-novo projeto`. O modal mantem titulo e descricao e adiciona a opcao de criar o
-projeto inicialmente publicado/visivel ou oculto. O backend ja existente para
-`isVisible` foi reutilizado; nao houve alteracao de schema ou migration nesta
+A criação foi removida da visão principal e passou a utilizar o modal `Criar
+novo projeto`. O modal mantém título e descrição e adiciona a opção de criar o
+projeto inicialmente publicado/visível ou oculto. O backend já existente para
+`isVisible` foi reutilizado; não houve alteração de schema ou migration nesta
 etapa.
 
 O upload de imagens do projeto agora inicia automaticamente no evento de
-selecao, sem o botao adicional `Adicionar imagens`. O seletor usa o mesmo
-padrao visual de `Imagens gerais do site`, com label estilizado, input oculto e
+seleção, sem o botão adicional `Adicionar imagens`. O seletor usa o mesmo
+padrão visual de `Imagens gerais do site`, com label estilizado, input oculto e
 nome dos arquivos selecionados.
 
-### Validacoes desta etapa
+### Validações desta etapa
 
 - `node --check frontend/src/admin.js`: aprovado;
 - build do frontend com `admin.html`: aprovado;
-- estrutura do modal de criacao e da lista de projetos verificada no DOM;
-- editor de projeto inicia oculto e e aberto somente apos selecionar um card;
+- estrutura do modal de criação e da lista de projetos verificada no DOM;
+- editor de projeto inicia oculto e é aberto somente após selecionar um card;
 - seletores de arquivo utilizam a classe visual compartilhada;
-- nenhuma alteracao de backend, Prisma ou migration foi necessaria.
+- nenhuma alteração de backend, Prisma ou migration foi necessária.
 
-## Atualizacao — grade resumida e modal de todos os projetos
+## Atualização — grade resumida e modal de todos os projetos
 
 Data: 10/08/2026
 
@@ -385,7 +385,7 @@ superior, na ordem obrigatória. O botão de visibilidade continua refletindo o
 estado atual do projeto. As versões antigas dessas ações foram removidas do
 conteúdo interno. Em telas menores, a barra pode quebrar sem criar overflow.
 
-### Validacoes desta etapa
+### Validações desta etapa
 
 - `createdAt` confirmado na resposta administrativa e ordenação existente do
   backend preservada;
@@ -394,9 +394,9 @@ conteúdo interno. Em telas menores, a barra pode quebrar sem criar overflow.
 - modal `Todos os projetos`, botão condicional e barra de ações confirmados no
   DOM;
 - rolagem interna do modal e editor inicialmente oculto confirmados;
-- nenhuma alteracao de backend, schema, migration, upload ou carrossel feita.
+- nenhuma alteração de backend, schema, migration, upload ou carrossel feita.
 
-## Atualizacao — modais compactos de projetos e carrossel
+## Atualização — modais compactos de projetos e carrossel
 
 Data: 10/08/2026
 
@@ -414,7 +414,7 @@ rodapé fixo do modal, sempre acessíveis durante a rolagem.
 - grade de quatro colunas e rolagem interna confirmadas na estrutura dos modais;
 - nenhuma alteração de backend, schema ou regras de negócio realizada.
 
-## Atualizacao — alinhamento das imagens gerais do site
+## Atualização — alinhamento das imagens gerais do site
 
 Data: 10/08/2026
 
@@ -426,6 +426,35 @@ Foram adicionadas alturas mínimas consistentes para título, preview, descriç�
 seletor de arquivo, ações e feedback, mantendo os campos das três seções
 alinhados mesmo quando os títulos possuem quantidades diferentes de linhas. Em
 telas menores a grade se adapta para uma coluna.
+
+## Atualização — preenchimento integral das imagens
+
+Data: 10/08/2026
+
+As prévias administrativas e o carrossel público agora preenchem integralmente
+as caixas visuais. A regra `object-fit: fill` foi aplicada às capas e imagens
+dos cards de projetos, aos modais de seleção, ao editor de projetos, às imagens
+personalizadas do carrossel, às imagens gerais do site e ao carrossel público
+“Nosso trabalho”.
+
+As caixas continuam responsivas e ocupam todo o espaço disponível para imagens
+horizontais, verticais, quadradas e panorâmicas. Como `fill` adapta largura e
+altura independentemente, imagens com proporção diferente da caixa podem sofrer
+distorção visual. Nenhum arquivo original é redimensionado ou reprocessado; a
+mudança ocorre somente na apresentação do frontend.
+
+Não há exceções de prévias nesta etapa: as regras de conteúdo revisadas usam
+`object-fit: fill`. Nesta etapa não foram alterados backend, schema, migrations,
+uploads ou contratos públicos.
+
+### Validações desta etapa
+
+- regras CSS revisadas para as prévias administrativas e públicas;
+- imagens com proporções horizontal, vertical, quadrada e panorâmica validadas
+  pelo preenchimento com `fill`;
+- build do frontend aprovado;
+- textos naturais do contexto revisados em UTF-8, sem alteração de identificadores
+  técnicos, blocos de código, endpoints ou caminhos.
 
 ## Estado de Git
 
