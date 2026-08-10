@@ -396,6 +396,24 @@ conteúdo interno. Em telas menores, a barra pode quebrar sem criar overflow.
 - rolagem interna do modal e editor inicialmente oculto confirmados;
 - nenhuma alteracao de backend, schema, migration, upload ou carrossel feita.
 
+## Atualizacao — modais compactos de projetos e carrossel
+
+Data: 10/08/2026
+
+Os cards do modal `Todos os projetos` agora seguem o mesmo padrão compacto do
+modal de seleção do carrossel, com quatro projetos por linha em telas largas e
+duas colunas em telas menores.
+
+Nos modais de projetos e do carrossel, somente a área de cards possui rolagem.
+O cabeçalho permanece visível e os botões de fechamento e confirmação ficam no
+rodapé fixo do modal, sempre acessíveis durante a rolagem.
+
+### Validações desta etapa
+
+- CSS validado no build do frontend;
+- grade de quatro colunas e rolagem interna confirmadas na estrutura dos modais;
+- nenhuma alteração de backend, schema ou regras de negócio realizada.
+
 ## Estado de Git
 
 As alterações desta etapa estão no working tree da branch de desenvolvimento atual. Nenhum commit, push ou pull foi executado automaticamente. O próximo commit deve incluir o schema, a migration, o código da API, os ajustes de dependências e este arquivo de contexto.
