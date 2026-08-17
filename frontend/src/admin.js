@@ -1,4 +1,4 @@
-const API_BASE = "http://localhost:3000";
+const API_BASE = import.meta.env.VITE_API_URL ?? "http://localhost:3000";
 
 const loginView = document.querySelector("#login-view");
 const dashboardView = document.querySelector("#dashboard-view");
@@ -11,6 +11,8 @@ const projectsFeedback = document.querySelector("#projects-feedback");
 const projectsList = document.querySelector("#projects-list");
 const siteImagesList = document.querySelector("#site-images-list");
 const siteImagesFeedback = document.querySelector("#site-images-feedback");
+const contactsList = document.querySelector("#contacts-list");
+const contactsFeedback = document.querySelector("#contacts-feedback");
 const SITE_IMAGE_SECTIONS = {
   "home.hero": {
     title: "Banner principal da página inicial",
@@ -573,6 +575,66 @@ async function loadProjects() {
   }
 }
 
+function formatContactDate(value) {
+  return new Intl.DateTimeFormat("pt-BR", {
+    dateStyle: "short",
+    timeStyle: "short",
+  }).format(new Date(value));
+}
+
+function createContactCard(contact) {
+  const statusLabels = {
+    PENDING: "Pendente",
+    READ: "Lido",
+    CONTACTED: "Atendido",
+  };
+  const statusSelect = createElement("select", {}, Object.entries(statusLabels).map(([value, label]) => {
+    const option = createElement("option", { value, textContent: label });
+    option.selected = contact.status === value;
+    return option;
+  }));
+  statusSelect.addEventListener("change", async () => {
+    try {
+      await request(`/api/admin/contacts/${contact.id}/status`, {
+        method: "PATCH",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ status: statusSelect.value }),
+      });
+      setFeedback(contactsFeedback, "Status atualizado.", "success");
+    } catch (error) {
+      statusSelect.value = contact.status;
+      setFeedback(contactsFeedback, error.message, "error");
+    }
+  });
+
+  const whatsappLink = `https://wa.me/${contact.phone.replace(/\D/g, "")}`;
+  return createElement("article", { className: "contact-card" }, [
+    createElement("div", { className: "contact-card-header" }, [
+      createElement("div", {}, [
+        createElement("h3", { textContent: contact.name }),
+        createElement("p", { className: "contact-card-meta", textContent: `${contact.phone} · ${formatContactDate(contact.createdAt)}` }),
+      ]),
+      createElement("span", { className: "visibility-badge", textContent: statusLabels[contact.status] ?? contact.status }),
+    ]),
+    createElement("p", { className: "contact-card-message", textContent: contact.message }),
+    createElement("div", { className: "contact-card-actions" }, [
+      statusSelect,
+      createElement("a", { className: "secondary-button", href: whatsappLink, target: "_blank", rel: "noopener noreferrer", textContent: "Abrir WhatsApp" }),
+    ]),
+  ]);
+}
+
+async function loadContacts() {
+  setFeedback(contactsFeedback, "Carregando...");
+  try {
+    const data = await request("/api/admin/contacts");
+    contactsList.replaceChildren(...data.contacts.map(createContactCard));
+    setFeedback(contactsFeedback, data.contacts.length ? "" : "Nenhuma solicitação recebida.");
+  } catch (error) {
+    setFeedback(contactsFeedback, error.message, "error");
+  }
+}
+
 loginForm.addEventListener("submit", async (event) => {
   event.preventDefault();
   setFeedback(loginFeedback, "Entrando...");
@@ -590,6 +652,7 @@ loginForm.addEventListener("submit", async (event) => {
     loginForm.reset();
     await loadProjects();
     await loadSiteImages();
+    await loadContacts();
   } catch (error) {
     setFeedback(loginFeedback, error.message, "error");
   }
@@ -620,6 +683,9 @@ document.querySelector("#refresh-button").addEventListener("click", loadProjects
 document
   .querySelector("#refresh-site-images-button")
   .addEventListener("click", loadSiteImages);
+document
+  .querySelector("#refresh-contacts-button")
+  .addEventListener("click", loadContacts);
 
 document.querySelector("#logout-button").addEventListener("click", async () => {
   try {
@@ -634,6 +700,7 @@ try {
   showDashboard(data.user);
   await loadProjects();
   await loadSiteImages();
+  await loadContacts();
 } catch {
   showLogin();
 }

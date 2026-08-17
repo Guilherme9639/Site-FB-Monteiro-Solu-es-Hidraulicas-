@@ -7,3 +7,6 @@ backend/prisma/*.db
 backend/prisma/*.db-journal
 backend/uploads/
 
+# Frontend alternativo mantido no repositório privado do Sites
+sites-frontend/
+

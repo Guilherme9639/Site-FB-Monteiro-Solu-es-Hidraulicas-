@@ -225,6 +225,58 @@ textarea {
   margin-top: 2rem;
 }
 
+.contacts-section {
+  margin-top: 2rem;
+}
+
+.contacts-list {
+  display: grid;
+  gap: 1rem;
+}
+
+.contact-card {
+  display: grid;
+  gap: 1rem;
+  padding: 1rem;
+  border: 1px solid #dce6ee;
+  border-radius: 0.75rem;
+  background: #ffffff;
+}
+
+.contact-card-header,
+.contact-card-actions {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.contact-card h3,
+.contact-card p {
+  margin: 0;
+}
+
+.contact-card-meta {
+  color: #60748a;
+  font-size: 0.85rem;
+}
+
+.contact-card-message {
+  white-space: pre-wrap;
+  line-height: 1.6;
+}
+
+.contact-card-actions {
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.contact-card-actions select {
+  width: auto;
+  min-width: 150px;
+  padding: 0.65rem;
+}
+
 .site-images-list {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));

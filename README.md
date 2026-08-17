@@ -21,6 +21,8 @@ Criar uma presença online clara e confiável para a empresa, permitindo que vis
 - `frontend/admin.html`: painel administrativo para autenticação, projetos e imagens.
 - `backend/`: API Express, autenticação, Prisma, banco SQLite, projetos, imagens e contatos.
 - `docs/CONTEUDO_INSTITUCIONAL.md`: textos institucionais aprovados e conteúdo público da empresa.
+- `docs/CHECKLIST_INFORMACOES_CLIENTE.md`: informações que precisam ser confirmadas antes da publicação.
+- `docs/ROTEIRO_REUNIAO_CLIENTE.md`: roteiro pronto para revisão durante a reunião com o cliente.
 
 ## Funcionalidades
 
@@ -63,6 +65,8 @@ Defina uma senha administrativa em `backend/.env` antes de executar o seed. Depo
 ```powershell
 npm.cmd run dev
 ```
+
+O frontend usa `http://localhost:3000` por padrão. Para apontar para uma API hospedada, copie `frontend/.env.example` para `frontend/.env` e defina `VITE_API_URL` com a URL pública do backend.
 
 Endereços locais:
 

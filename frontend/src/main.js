@@ -1,6 +1,8 @@
+const apiBaseUrl = import.meta.env.VITE_API_URL ?? "http://localhost:3000";
+
 async function verificarApi() {
   try {
-    const response = await fetch("http://localhost:3000/api/health");
+    const response = await fetch(`${apiBaseUrl}/api/health`);
 
     if (!response.ok) {
       throw new Error("O servidor retornou um erro.");
@@ -16,7 +18,6 @@ async function verificarApi() {
 verificarApi();
 
 const projectCarousel = document.querySelector("#project-carousel");
-const apiBaseUrl = "http://localhost:3000";
 let carouselTimer;
 
 function renderProject(project) {
@@ -93,7 +94,7 @@ function renderProject(project) {
 
 async function carregarObra() {
   try {
-    const response = await fetch("http://localhost:3000/api/projects");
+    const response = await fetch(`${apiBaseUrl}/api/projects`);
     if (!response.ok) throw new Error("Não foi possível carregar as obras.");
     const data = await response.json();
     renderProject(data.projects?.[0]);
@@ -121,7 +122,7 @@ contactForm?.addEventListener("submit", async (event) => {
   formFeedback.textContent = "";
 
   try {
-    const response = await fetch("http://localhost:3000/api/contatos", {
+    const response = await fetch(`${apiBaseUrl}/api/contatos`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

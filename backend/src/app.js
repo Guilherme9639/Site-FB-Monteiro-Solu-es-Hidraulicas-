@@ -5,6 +5,7 @@ import authRoutes from "./routes/authRoutes.js";
 import adminProjectRoutes from "./routes/adminProjectRoutes.js";
 import adminSiteImageRoutes from "./routes/adminSiteImageRoutes.js";
 import contactRoutes from "./routes/contactRoutes.js";
+import adminContactRoutes from "./routes/adminContactRoutes.js";
 import mediaRoutes from "./routes/mediaRoutes.js";
 import publicContentRoutes from "./routes/publicContentRoutes.js";
 import { optionalAuth, requireAuth } from "./middlewares/auth.js";
@@ -42,6 +43,7 @@ const contactLimiter = rateLimit({
 
 app.use("/api/contatos", contactLimiter, contactRoutes);
 app.use("/api/admin/auth", authRoutes);
+app.use("/api/admin/contacts", requireAuth, adminContactRoutes);
 app.use("/api/admin/projects", requireAuth, adminProjectRoutes);
 app.use("/api/admin/site-images", requireAuth, adminSiteImageRoutes);
 app.use("/api/media", optionalAuth, mediaRoutes);

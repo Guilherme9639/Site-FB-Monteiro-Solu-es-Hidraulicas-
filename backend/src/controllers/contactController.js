@@ -51,3 +51,42 @@ export async function createContact(request, response, next) {
     return next(error);
   }
 }
+
+const CONTACT_STATUSES = new Set(["PENDING", "READ", "CONTACTED"]);
+
+export async function listAdminContacts(request, response, next) {
+  try {
+    const contacts = await prisma.contact.findMany({
+      orderBy: { createdAt: "desc" },
+    });
+
+    return response.status(200).json({ contacts });
+  } catch (error) {
+    return next(error);
+  }
+}
+
+export async function updateContactStatus(request, response, next) {
+  const status = request.body?.status;
+
+  if (!CONTACT_STATUSES.has(status)) {
+    return response.status(400).json({
+      message: "Status de contato inválido.",
+    });
+  }
+
+  try {
+    const contact = await prisma.contact.update({
+      where: { id: request.params.contactId },
+      data: { status },
+    });
+
+    return response.status(200).json({ contact });
+  } catch (error) {
+    if (error.code === "P2025") {
+      return response.status(404).json({ message: "Contato não encontrado." });
+    }
+
+    return next(error);
+  }
+}
