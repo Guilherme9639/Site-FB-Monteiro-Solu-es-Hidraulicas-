@@ -24,7 +24,7 @@ Criar uma presença online clara e confiável para a empresa, permitindo que vis
 
 ## Funcionalidades
 
-- Carrossel da obra publicada mais recente na página inicial.
+- Carrossel configurável de obras na página inicial, com modo personalizado ou por projeto publicado.
 - Troca automática de fotos a cada 5 segundos, com navegação manual.
 - Página Sobre com trajetória profissional e especialidade em kits hidráulicos.
 - Cadastro, edição, ordenação, capa, visibilidade e upload de imagens pelo painel.
@@ -33,6 +33,11 @@ Criar uma presença online clara e confiável para a empresa, permitindo que vis
 - Layout responsivo para computadores e celulares.
 
 ## Desenvolvimento
+
+O carrossel publico da secao “Nosso trabalho” e resolvido pela API
+`GET /api/work-carousel`. O painel permite selecionar imagens personalizadas ou
+um projeto publicado; a pagina Sobre nao usa mais automaticamente o primeiro
+projeto cadastrado.
 
 O projeto utiliza um fluxo de trabalho com branches e pull requests para organizar as entregas e registrar a evolução do site.
 

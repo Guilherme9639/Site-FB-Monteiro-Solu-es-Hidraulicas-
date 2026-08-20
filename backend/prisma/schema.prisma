@@ -41,9 +41,41 @@ model Project {
   createdAt   DateTime       @default(now())
   updatedAt   DateTime       @updatedAt
   images      ProjectImage[]
+  carouselConfigs WorkCarouselConfig[] @relation("WorkCarouselProject")
 
   @@index([isVisible])
   @@index([createdAt])
+}
+
+model WorkCarouselConfig {
+  id                String              @id @default(uuid())
+  mode              String              @default("CUSTOM")
+  selectedProjectId String?
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+  selectedProject   Project?            @relation("WorkCarouselProject", fields: [selectedProjectId], references: [id], onDelete: SetNull)
+  images            WorkCarouselImage[]
+
+  @@index([selectedProjectId])
+}
+
+model WorkCarouselImage {
+  id           String             @id @default(uuid())
+  configId     String
+  url          String
+  storageKey   String             @unique
+  originalName String
+  mimeType     String
+  size         Int
+  description  String?
+  displayOrder Int                @default(0)
+  isVisible    Boolean            @default(true)
+  createdAt    DateTime           @default(now())
+  updatedAt    DateTime           @updatedAt
+  config       WorkCarouselConfig @relation(fields: [configId], references: [id], onDelete: Cascade)
+
+  @@index([configId, displayOrder])
+  @@index([configId, isVisible])
 }
 
 model ProjectImage {
