@@ -4,10 +4,12 @@ import { rateLimit } from "express-rate-limit";
 import authRoutes from "./routes/authRoutes.js";
 import adminProjectRoutes from "./routes/adminProjectRoutes.js";
 import adminSiteImageRoutes from "./routes/adminSiteImageRoutes.js";
+import adminWorkCarouselRoutes from "./routes/adminWorkCarouselRoutes.js";
 import contactRoutes from "./routes/contactRoutes.js";
 import adminContactRoutes from "./routes/adminContactRoutes.js";
 import mediaRoutes from "./routes/mediaRoutes.js";
 import publicContentRoutes from "./routes/publicContentRoutes.js";
+import workCarouselRoutes from "./routes/workCarouselRoutes.js";
 import { optionalAuth, requireAuth } from "./middlewares/auth.js";
 
 const app = express();
@@ -46,8 +48,10 @@ app.use("/api/admin/auth", authRoutes);
 app.use("/api/admin/contacts", requireAuth, adminContactRoutes);
 app.use("/api/admin/projects", requireAuth, adminProjectRoutes);
 app.use("/api/admin/site-images", requireAuth, adminSiteImageRoutes);
+app.use("/api/admin/work-carousel", requireAuth, adminWorkCarouselRoutes);
 app.use("/api/media", optionalAuth, mediaRoutes);
 app.use("/api", publicContentRoutes);
+app.use("/api/work-carousel", workCarouselRoutes);
 
 app.get("/api/health", (request, response) => {
   response.status(200).json({

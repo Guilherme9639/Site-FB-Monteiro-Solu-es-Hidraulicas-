@@ -92,12 +92,102 @@ function renderProject(project) {
   restartCarouselTimer();
 }
 
+function renderWorkCarousel(carousel) {
+  if (!carousel?.images?.length) {
+    projectCarousel.innerHTML =
+      '<p class="carousel-status">Nenhuma obra publicada no momento.</p>';
+    return;
+  }
+
+  const images = carousel.images;
+  const projectTitle = carousel.project?.title || "Obras realizadas";
+  const projectDescription = carousel.project?.description || "Confira os detalhes desta obra.";
+  let currentImage = 0;
+  const projectsLink = window.location.pathname.endsWith("sobre.html")
+    ? "#obras"
+    : "/sobre.html#obras";
+
+  const frame = document.createElement("div");
+  frame.className = "project-carousel-frame";
+  const imageElement = document.createElement("img");
+  imageElement.className = "project-carousel-image";
+  const previousButton = document.createElement("button");
+  previousButton.className = "carousel-control carousel-control-prev";
+  previousButton.type = "button";
+  previousButton.setAttribute("aria-label", "Foto anterior");
+  previousButton.textContent = "‹";
+  const nextButton = document.createElement("button");
+  nextButton.className = "carousel-control carousel-control-next";
+  nextButton.type = "button";
+  nextButton.setAttribute("aria-label", "Próxima foto");
+  nextButton.textContent = "›";
+  const indicators = document.createElement("div");
+  indicators.className = "carousel-indicators";
+  indicators.setAttribute("role", "tablist");
+  indicators.setAttribute("aria-label", "Fotos da obra");
+  frame.append(imageElement, previousButton, nextButton, indicators);
+
+  const details = document.createElement("div");
+  details.className = "project-carousel-details";
+  const title = document.createElement("h3");
+  title.textContent = projectTitle;
+  const description = document.createElement("p");
+  description.textContent = projectDescription;
+  const moreLink = document.createElement("a");
+  moreLink.className = "secondary-button project-more-link";
+  moreLink.href = projectsLink;
+  moreLink.textContent = "Ver mais trabalhos";
+  details.append(title, description, moreLink);
+  projectCarousel.replaceChildren(frame, details);
+
+  function showImage(index) {
+    currentImage = (index + images.length) % images.length;
+    const image = images[currentImage];
+    imageElement.src = `${apiBaseUrl}${image.url}`;
+    imageElement.alt = image.description || projectTitle;
+    indicators.querySelectorAll("button").forEach((button, buttonIndex) => {
+      button.classList.toggle("is-active", buttonIndex === currentImage);
+      button.setAttribute("aria-selected", String(buttonIndex === currentImage));
+    });
+  }
+
+  images.forEach((image, index) => {
+    const indicator = document.createElement("button");
+    indicator.type = "button";
+    indicator.className = "carousel-indicator";
+    indicator.setAttribute("role", "tab");
+    indicator.setAttribute("aria-label", `Exibir foto ${index + 1}`);
+    indicator.addEventListener("click", () => {
+      showImage(index);
+      restartCarouselTimer();
+    });
+    indicators.append(indicator);
+  });
+
+  previousButton.addEventListener("click", () => {
+    showImage(currentImage - 1);
+    restartCarouselTimer();
+  });
+  nextButton.addEventListener("click", () => {
+    showImage(currentImage + 1);
+    restartCarouselTimer();
+  });
+
+  function restartCarouselTimer() {
+    clearInterval(carouselTimer);
+    carouselTimer = setInterval(() => showImage(currentImage + 1), 5000);
+  }
+
+  showImage(0);
+  restartCarouselTimer();
+}
+
 async function carregarObra() {
   try {
-    const response = await fetch(`${apiBaseUrl}/api/projects`);
+    const response = await fetch(`${apiBaseUrl}/api/work-carousel`);
     if (!response.ok) throw new Error("Não foi possível carregar as obras.");
     const data = await response.json();
-    renderProject(data.projects?.[0]);
+    renderWorkCarousel(data);
   } catch (error) {
     projectCarousel.innerHTML =
       '<p class="carousel-status">Não foi possível carregar a obra agora.</p>';
@@ -148,3 +238,18 @@ contactForm?.addEventListener("submit", async (event) => {
     submitButton.textContent = "Enviar solicitação";
   }
 });
+const featuredProjects = [
+  {
+    name: "Obra Ricam - Padre Eustaquio - BH - MG",
+    description: "Prédio completo com 6 pavimentos, prevenção de incêndio, esgoto, agua quente e fria.",
+    cover: "images/obras/ricam/capa.jpeg",
+    images: [
+      "images/obras/ricam/1.jpeg",
+      "images/obras/ricam/2.jpeg",
+      "images/obras/ricam/3.jpeg",
+    ],
+  },
+];
+function showProject() {
+  console.log(featuredProjects);
+}

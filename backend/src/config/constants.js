@@ -4,6 +4,9 @@ export const SESSION_TTL_MS = SESSION_TTL_HOURS * 60 * 60 * 1000;
 export const MAX_IMAGES_PER_PROJECT = Number(
   process.env.MAX_IMAGES_PER_PROJECT ?? 20,
 );
+export const MAX_IMAGES_PER_WORK_CAROUSEL = Number(
+  process.env.MAX_IMAGES_PER_WORK_CAROUSEL ?? 20,
+);
 export const MAX_IMAGE_SIZE_MB = Number(process.env.MAX_IMAGE_SIZE_MB ?? 25);
 export const MAX_IMAGE_SIZE_BYTES = MAX_IMAGE_SIZE_MB * 1024 * 1024;
 
