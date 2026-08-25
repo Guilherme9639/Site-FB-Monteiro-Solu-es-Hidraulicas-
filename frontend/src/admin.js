@@ -21,10 +21,8 @@ const allProjectsModal = document.querySelector("#all-projects-modal");
 const allProjectsList = document.querySelector("#all-projects-list");
 const siteImagesList = document.querySelector("#site-images-list");
 const siteImagesFeedback = document.querySelector("#site-images-feedback");
-<<<<<<< HEAD
 const contactsList = document.querySelector("#contacts-list");
 const contactsFeedback = document.querySelector("#contacts-feedback");
-=======
 const workCarouselCustomView = document.querySelector("#work-carousel-custom-view");
 const workCarouselProjectView = document.querySelector("#work-carousel-project-view");
 const workCarouselImagesList = document.querySelector("#work-carousel-images-list");
@@ -44,7 +42,6 @@ let selectedProjectId = null;
 let workCarouselConfig = null;
 let selectedProjectDraftId = null;
 let workCarouselUploadInProgress = false;
->>>>>>> 8e5b39e8303890449a1b77ae3dfde39d6d0c9c0a
 const SITE_IMAGE_SECTIONS = {
   "home.hero": {
     title: "Banner principal da página inicial",
@@ -1044,10 +1041,9 @@ document
   .querySelector("#refresh-site-images-button")
   .addEventListener("click", loadSiteImages);
 document
-<<<<<<< HEAD
   .querySelector("#refresh-contacts-button")
   .addEventListener("click", loadContacts);
-=======
+document
   .querySelector("#refresh-work-carousel-button")
   .addEventListener("click", loadWorkCarousel);
 document
@@ -1061,7 +1057,6 @@ document
   .querySelector("#select-work-carousel-project")
   .addEventListener("click", openProjectSelector);
 projectSelectorSaveButton.addEventListener("click", saveProjectSelection);
->>>>>>> 8e5b39e8303890449a1b77ae3dfde39d6d0c9c0a
 
 document.querySelector("#logout-button").addEventListener("click", async () => {
   try {
