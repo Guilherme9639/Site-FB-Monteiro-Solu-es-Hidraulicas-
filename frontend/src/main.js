@@ -1,255 +1,139 @@
 const apiBaseUrl = import.meta.env.VITE_API_URL ?? "http://localhost:3000";
 
-async function verificarApi() {
-  try {
-    const response = await fetch(`${apiBaseUrl}/api/health`);
+const fallbackPhotos = [
+  { src: "/images/obras/ricam/capa.jpeg", label: "Capa da obra" },
+  { src: "/images/obras/ricam/01.jpeg", label: "Instalação hidráulica" },
+  { src: "/images/obras/ricam/02.jpeg", label: "Execução da obra" },
+  { src: "/images/obras/ricam/03.jpeg", label: "Detalhe da instalação" },
+];
 
-    if (!response.ok) {
-      throw new Error("O servidor retornou um erro.");
-    }
+const escapeHtml = (value) => String(value ?? "").replace(/[&<>"']/g, (character) => ({
+  "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;",
+}[character]));
 
-    const data = await response.json();
-    console.log(data.message);
-  } catch (error) {
-    console.error("Não foi possível conectar ao servidor:", error);
-  }
+function mediaUrl(url) {
+  if (!url) return "";
+  if (url.startsWith("http://") || url.startsWith("https://")) return url;
+  if (url.startsWith("/api/")) return `${apiBaseUrl}${url}`;
+  return url.startsWith("/") ? url : `/${url}`;
 }
 
-verificarApi();
+function normalizeImages(carousel) {
+  if (!carousel?.images?.length) return fallbackPhotos;
+  return carousel.images.map((image) => ({
+    src: mediaUrl(image.url),
+    label: image.description || carousel.project?.title || "Imagem da obra",
+  }));
+}
 
-const projectCarousel = document.querySelector("#project-carousel");
-let carouselTimer;
+function renderWorks(images) {
+  const strip = document.querySelector("#works-strip");
+  if (!strip) return;
+  strip.replaceChildren(...images.slice(1).map((image) => {
+    const element = document.createElement("img");
+    element.src = image.src;
+    element.alt = image.label;
+    return element;
+  }));
+}
 
-function renderProject(project) {
-  if (!project || !project.images?.length) {
-    projectCarousel.innerHTML =
-      '<p class="carousel-status">Nenhuma obra publicada no momento.</p>';
-    return;
-  }
+function renderProjectCarousel(carousel) {
+  const target = document.querySelector("#project-carousel");
+  if (!target) return;
+  const images = normalizeImages(carousel);
+  const projectTitle = carousel?.project?.title || "Obra em destaque";
+  let activePhoto = 0;
 
-  const images = project.images;
-  let currentImage = 0;
-  const projectsLink = window.location.pathname.endsWith("sobre.html")
-    ? "#obras"
-    : "/sobre.html#obras";
-
-  projectCarousel.innerHTML = `
-    <div class="project-carousel-frame">
-      <img class="project-carousel-image" src="${apiBaseUrl}${images[0].url}" alt="${images[0].description || project.title}" />
-      <button class="carousel-control carousel-control-prev" type="button" aria-label="Foto anterior">&#10094;</button>
-      <button class="carousel-control carousel-control-next" type="button" aria-label="Próxima foto">&#10095;</button>
-      <div class="carousel-indicators" role="tablist" aria-label="Fotos da obra"></div>
+  target.innerHTML = `
+    <div class="carousel-image-wrap">
+      <img class="carousel-image" src="${images[0].src}" alt="${escapeHtml(images[0].label)}" />
+      <span class="carousel-counter">01 / ${String(images.length).padStart(2, "0")}</span>
+      <button class="carousel-arrow carousel-arrow-left" type="button" aria-label="Foto anterior">←</button>
+      <button class="carousel-arrow carousel-arrow-right" type="button" aria-label="Próxima foto">→</button>
     </div>
-    <div class="project-carousel-details">
-      <h3>${project.title}</h3>
-      <p>${project.description || "Confira os detalhes desta obra."}</p>
-      <a class="secondary-button project-more-link" href="${projectsLink}">Ver mais trabalhos</a>
-    </div>
+    <div class="carousel-caption"><div><p class="eyebrow">Obra em destaque</p><h2>${escapeHtml(projectTitle)}</h2></div><a href="/sobre.html#obras">Ver mais trabalhos <span>↗</span></a></div>
+    <div class="carousel-dots" role="tablist" aria-label="Selecionar foto"></div>
   `;
 
-  const imageElement = projectCarousel.querySelector(".project-carousel-image");
-  const indicators = projectCarousel.querySelector(".carousel-indicators");
+  const imageElement = target.querySelector(".carousel-image");
+  const counter = target.querySelector(".carousel-counter");
+  const dots = target.querySelector(".carousel-dots");
+  let timer;
 
-  function showImage(index) {
-    currentImage = (index + images.length) % images.length;
-    const image = images[currentImage];
-    imageElement.src = `${apiBaseUrl}${image.url}`;
-    imageElement.alt = image.description || project.title;
-    indicators.querySelectorAll("button").forEach((button, buttonIndex) => {
-      button.classList.toggle("is-active", buttonIndex === currentImage);
-      button.setAttribute("aria-selected", String(buttonIndex === currentImage));
+  function showPhoto(index) {
+    activePhoto = (index + images.length) % images.length;
+    const photo = images[activePhoto];
+    imageElement.src = photo.src;
+    imageElement.alt = photo.label;
+    counter.textContent = `${String(activePhoto + 1).padStart(2, "0")} / ${String(images.length).padStart(2, "0")}`;
+    dots.querySelectorAll("button").forEach((dot, dotIndex) => {
+      dot.classList.toggle("is-active", dotIndex === activePhoto);
+      dot.setAttribute("aria-selected", String(dotIndex === activePhoto));
     });
   }
 
-  images.forEach((image, index) => {
-    const indicator = document.createElement("button");
-    indicator.type = "button";
-    indicator.className = "carousel-indicator";
-    indicator.setAttribute("role", "tab");
-    indicator.setAttribute("aria-label", `Exibir foto ${index + 1}`);
-    indicator.addEventListener("click", () => {
-      showImage(index);
-      restartCarouselTimer();
-    });
-    indicators.append(indicator);
-  });
-
-  projectCarousel.querySelector(".carousel-control-prev").addEventListener("click", () => {
-    showImage(currentImage - 1);
-    restartCarouselTimer();
-  });
-  projectCarousel.querySelector(".carousel-control-next").addEventListener("click", () => {
-    showImage(currentImage + 1);
-    restartCarouselTimer();
-  });
-
-  function restartCarouselTimer() {
-    clearInterval(carouselTimer);
-    carouselTimer = setInterval(() => showImage(currentImage + 1), 5000);
+  function restartTimer() {
+    window.clearInterval(timer);
+    timer = window.setInterval(() => showPhoto(activePhoto + 1), 5000);
   }
 
-  showImage(0);
-  restartCarouselTimer();
+  images.forEach((photo, index) => {
+    const dot = document.createElement("button");
+    dot.type = "button";
+    dot.setAttribute("role", "tab");
+    dot.setAttribute("aria-label", `Exibir ${photo.label}`);
+    dot.addEventListener("click", () => { showPhoto(index); restartTimer(); });
+    dots.append(dot);
+  });
+  target.querySelector(".carousel-arrow-left").addEventListener("click", () => { showPhoto(activePhoto - 1); restartTimer(); });
+  target.querySelector(".carousel-arrow-right").addEventListener("click", () => { showPhoto(activePhoto + 1); restartTimer(); });
+  showPhoto(0);
+  restartTimer();
 }
 
-function renderWorkCarousel(carousel) {
-  if (!carousel?.images?.length) {
-    projectCarousel.innerHTML =
-      '<p class="carousel-status">Nenhuma obra publicada no momento.</p>';
-    return;
-  }
-
-  const images = carousel.images;
-  const projectTitle = carousel.project?.title || "Obras realizadas";
-  const projectDescription = carousel.project?.description || "Confira os detalhes desta obra.";
-  let currentImage = 0;
-  const projectsLink = window.location.pathname.endsWith("sobre.html")
-    ? "#obras"
-    : "/sobre.html#obras";
-
-  const frame = document.createElement("div");
-  frame.className = "project-carousel-frame";
-  const imageElement = document.createElement("img");
-  imageElement.className = "project-carousel-image";
-  const previousButton = document.createElement("button");
-  previousButton.className = "carousel-control carousel-control-prev";
-  previousButton.type = "button";
-  previousButton.setAttribute("aria-label", "Foto anterior");
-  previousButton.textContent = "‹";
-  const nextButton = document.createElement("button");
-  nextButton.className = "carousel-control carousel-control-next";
-  nextButton.type = "button";
-  nextButton.setAttribute("aria-label", "Próxima foto");
-  nextButton.textContent = "›";
-  const indicators = document.createElement("div");
-  indicators.className = "carousel-indicators";
-  indicators.setAttribute("role", "tablist");
-  indicators.setAttribute("aria-label", "Fotos da obra");
-  frame.append(imageElement, previousButton, nextButton, indicators);
-
-  const details = document.createElement("div");
-  details.className = "project-carousel-details";
-  const title = document.createElement("h3");
-  title.textContent = projectTitle;
-  const description = document.createElement("p");
-  description.textContent = projectDescription;
-  const moreLink = document.createElement("a");
-  moreLink.className = "secondary-button project-more-link";
-  moreLink.href = projectsLink;
-  moreLink.textContent = "Ver mais trabalhos";
-  details.append(title, description, moreLink);
-  projectCarousel.replaceChildren(frame, details);
-
-  function showImage(index) {
-    currentImage = (index + images.length) % images.length;
-    const image = images[currentImage];
-    imageElement.src = `${apiBaseUrl}${image.url}`;
-    imageElement.alt = image.description || projectTitle;
-    indicators.querySelectorAll("button").forEach((button, buttonIndex) => {
-      button.classList.toggle("is-active", buttonIndex === currentImage);
-      button.setAttribute("aria-selected", String(buttonIndex === currentImage));
-    });
-  }
-
-  images.forEach((image, index) => {
-    const indicator = document.createElement("button");
-    indicator.type = "button";
-    indicator.className = "carousel-indicator";
-    indicator.setAttribute("role", "tab");
-    indicator.setAttribute("aria-label", `Exibir foto ${index + 1}`);
-    indicator.addEventListener("click", () => {
-      showImage(index);
-      restartCarouselTimer();
-    });
-    indicators.append(indicator);
-  });
-
-  previousButton.addEventListener("click", () => {
-    showImage(currentImage - 1);
-    restartCarouselTimer();
-  });
-  nextButton.addEventListener("click", () => {
-    showImage(currentImage + 1);
-    restartCarouselTimer();
-  });
-
-  function restartCarouselTimer() {
-    clearInterval(carouselTimer);
-    carouselTimer = setInterval(() => showImage(currentImage + 1), 5000);
-  }
-
-  showImage(0);
-  restartCarouselTimer();
-}
-
-async function carregarObra() {
+async function loadWorkCarousel() {
   try {
     const response = await fetch(`${apiBaseUrl}/api/work-carousel`);
-    if (!response.ok) throw new Error("Não foi possível carregar as obras.");
+    if (!response.ok) throw new Error("Não foi possível carregar a obra.");
     const data = await response.json();
-    renderWorkCarousel(data);
+    const images = normalizeImages(data);
+    renderProjectCarousel(data);
+    renderWorks(images);
   } catch (error) {
-    projectCarousel.innerHTML =
-      '<p class="carousel-status">Não foi possível carregar a obra agora.</p>';
-    console.error(error);
+    renderProjectCarousel(null);
+    renderWorks(fallbackPhotos);
+    console.warn("Usando imagens locais enquanto a API não está disponível.", error);
   }
 }
 
-carregarObra();
+loadWorkCarousel();
 
 const contactForm = document.querySelector("#contact-form");
 const formFeedback = document.querySelector("#form-feedback");
 
 contactForm?.addEventListener("submit", async (event) => {
   event.preventDefault();
-
   const submitButton = contactForm.querySelector('button[type="submit"]');
-  const formData = new FormData(contactForm);
-  const contact = Object.fromEntries(formData.entries());
-
   submitButton.disabled = true;
   submitButton.textContent = "Enviando...";
   formFeedback.textContent = "";
-
+  formFeedback.className = "form-feedback";
   try {
     const response = await fetch(`${apiBaseUrl}/api/contatos`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(contact),
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(Object.fromEntries(new FormData(contactForm).entries())),
     });
-
     const data = await response.json();
-
-    if (!response.ok) {
-      throw new Error(data.message);
-    }
-
-    formFeedback.textContent = data.message;
-    formFeedback.style.color = "#087f5b";
+    if (!response.ok) throw new Error(data.message || "Não foi possível enviar a solicitação.");
+    formFeedback.textContent = data.message || "Solicitação enviada com sucesso.";
+    formFeedback.classList.add("success");
     contactForm.reset();
   } catch (error) {
-    formFeedback.textContent =
-      error.message || "Não foi possível enviar a solicitação.";
-    formFeedback.style.color = "#c92a2a";
+    formFeedback.textContent = error.message || "Não foi possível enviar a solicitação.";
+    formFeedback.classList.add("error");
   } finally {
     submitButton.disabled = false;
     submitButton.textContent = "Enviar solicitação";
   }
 });
-const featuredProjects = [
-  {
-    name: "Obra Ricam - Padre Eustaquio - BH - MG",
-    description: "Prédio completo com 6 pavimentos, prevenção de incêndio, esgoto, agua quente e fria.",
-    cover: "images/obras/ricam/capa.jpeg",
-    images: [
-      "images/obras/ricam/1.jpeg",
-      "images/obras/ricam/2.jpeg",
-      "images/obras/ricam/3.jpeg",
-    ],
-  },
-];
-function showProject() {
-  console.log(featuredProjects);
-}
