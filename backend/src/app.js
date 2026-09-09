@@ -13,10 +13,15 @@ import workCarouselRoutes from "./routes/workCarouselRoutes.js";
 import { optionalAuth, requireAuth } from "./middlewares/auth.js";
 
 const app = express();
+const configuredOrigins = (process.env.CORS_ORIGINS ?? process.env.FRONTEND_URL ?? "")
+  .split(",")
+  .map((origin) => origin.trim())
+  .filter(Boolean);
 const allowedOrigins = new Set([
-  process.env.FRONTEND_URL ?? "http://localhost:5173",
+  ...configuredOrigins,
   "http://localhost:5173",
   "http://127.0.0.1:5173",
+  "https://fb-monteiro-alternativo.cardozoalmeidaguilhe.chatgpt.site",
 ]);
 
 app.use(
