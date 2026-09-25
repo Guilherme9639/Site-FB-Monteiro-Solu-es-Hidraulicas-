@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 96" role="img" aria-labelledby="title desc">
+  <title id="title">FINNOVA Studio</title>
+  <desc id="desc">Marca demonstrativa para o case de soluções hidráulicas</desc>
+  <rect width="84" height="84" rx="42" fill="#98e6df"/>
+  <path d="M24 27h36M24 42h26M24 57h18" fill="none" stroke="#092f43" stroke-width="7" stroke-linecap="round"/>
+  <text x="105" y="42" fill="#fff" font-family="Arial,sans-serif" font-size="24" font-weight="700" letter-spacing="4">FINNOVA</text>
+  <text x="106" y="68" fill="#98e6df" font-family="Arial,sans-serif" font-size="13" font-weight="700" letter-spacing="5">STUDIO</text>
+</svg>
